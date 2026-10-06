@@ -5,3 +5,4 @@ pandas
 stmol
 scipy
 numpy
+gemmi
