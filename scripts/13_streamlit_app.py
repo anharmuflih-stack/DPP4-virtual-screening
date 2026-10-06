@@ -337,18 +337,21 @@ with col_result:
                 with open(receptor_pdb, 'r') as f:
                     view.addModel(f.read(), 'pdb')
                 
+                # Ekstrak hanya Pose Terbaik (MODEL 1) untuk ditampilkan di 3D Viewer
+                best_pose_pdbqt = docked_pdbqt.split("MODEL 2")[0] if "MODEL 2" in docked_pdbqt else docked_pdbqt
+                
                 # Add Ligand
-                view.addModel(docked_pdbqt, 'pdbqt')
+                view.addModel(best_pose_pdbqt, 'pdbqt')
                 
                 # Styles (Kontras Ekstrem untuk Kejelasan Maksimal)
-                view.setStyle({'model': 0}, {'cartoon': {'color': '#cbd5e1', 'style': 'oval', 'thickness': 0.15, 'opacity': 0.6}})
+                view.setStyle({'model': 0}, {'cartoon': {'color': '#e2e8f0', 'style': 'oval', 'thickness': 0.2}})
                 
                 # Ligand: Kuning Cerah dan sangat tebal
-                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'yellowCarbon', 'radius': 0.3}})
+                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'yellowCarbon', 'radius': 0.25}})
                 
                 # Interacting Residues (Jarak 3.5 Angstrom, Warna Magenta Menyala, plus Label Tebal)
                 interaction_sel = {'model': 0, 'within': {'distance': 3.5, 'sel': {'model': 1}}}
-                view.addStyle(interaction_sel, {'stick': {'colorscheme': 'magentaCarbon', 'radius': 0.2}})
+                view.addStyle(interaction_sel, {'stick': {'colorscheme': 'magentaCarbon', 'radius': 0.15}})
                 view.addResLabels(interaction_sel, {
                     'fontOpacity': 1.0, 
                     'fontSize': 14, 
