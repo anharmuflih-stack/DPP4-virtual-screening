@@ -11,12 +11,12 @@ from meeko import MoleculePreparation, PDBQTWriterLegacy
 from stmol import showmol
 import py3Dmol
 
-st.set_page_config(page_title="Dirof DPP-4", page_icon="🧬", layout="wide")
+st.set_page_config(page_title="🧬 DPP-4 Virtual Screening", page_icon="🧬", layout="wide")
 
 # ==========================================
 # 1. SETUP LINGKUNGAN & VINA
 # ==========================================
-st.title("🧬 Dirof DPP-4 Virtual Screening")
+st.title("🧬 DPP-4 Virtual Screening")
 st.markdown("Platform komputasional penemuan obat untuk reseptor *Dipeptidyl Peptidase-4*.")
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
