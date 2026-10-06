@@ -340,15 +340,25 @@ with col_result:
                 # Add Ligand
                 view.addModel(docked_pdbqt, 'pdbqt')
                 
-                # Styles (Lebih kontras dan jelas)
-                view.setStyle({'model': 0}, {'cartoon': {'color': 'white', 'style': 'oval', 'thickness': 0.2, 'opacity': 0.9}})
-                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'greenCarbon', 'radius': 0.2}, 'sphere': {'colorscheme': 'greenCarbon', 'radius': 0.4}})
+                # Styles (Kontras Ekstrem untuk Kejelasan Maksimal)
+                view.setStyle({'model': 0}, {'cartoon': {'color': '#cbd5e1', 'style': 'oval', 'thickness': 0.15, 'opacity': 0.6}})
                 
-                # Interacting Residues & Surface (Jarak 4 Angstrom, Warna Cyan Terang, plus Label)
-                interaction_sel = {'model': 0, 'within': {'distance': 4.0, 'sel': {'model': 1}}}
-                view.addStyle(interaction_sel, {'stick': {'colorscheme': 'cyanCarbon', 'radius': 0.15}})
-                view.addResLabels(interaction_sel, {'fontOpacity': 0.9, 'fontSize': 13, 'fontColor': 'black', 'backgroundColor': '#f8fafc', 'showBackground': True})
-                view.addSurface(py3Dmol.VDW, {'opacity': 0.25, 'color': '#0ea5e9'}, interaction_sel, interaction_sel)
+                # Ligand: Kuning Cerah dan sangat tebal
+                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'yellowCarbon', 'radius': 0.3}})
+                
+                # Interacting Residues (Jarak 3.5 Angstrom, Warna Magenta Menyala, plus Label Tebal)
+                interaction_sel = {'model': 0, 'within': {'distance': 3.5, 'sel': {'model': 1}}}
+                view.addStyle(interaction_sel, {'stick': {'colorscheme': 'magentaCarbon', 'radius': 0.2}})
+                view.addResLabels(interaction_sel, {
+                    'fontOpacity': 1.0, 
+                    'fontSize': 14, 
+                    'fontColor': '#ffffff', 
+                    'backgroundColor': '#db2777', 
+                    'showBackground': True
+                })
+                
+                # Permukaan saku ikat (Binding Pocket Surface) berwarna biru transparan
+                view.addSurface(py3Dmol.VDW, {'opacity': 0.35, 'color': '#0ea5e9'}, interaction_sel, interaction_sel)
                 
                 view.zoomTo({'model': 1})
                 showmol(view, height=450, width="100%")
