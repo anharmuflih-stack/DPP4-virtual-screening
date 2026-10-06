@@ -5,6 +5,9 @@ Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibit
 🌐 **Akses Website Publik (Streamlit Cloud):** 
 [**https://dpp4virtualscreener.streamlit.app**](https://dpp4virtualscreener.streamlit.app)
 
+💻 **Kode Sumber / Repositori GitHub:** 
+[**https://github.com/anharmuflih-stack/DPP4-virtual-screening**](https://github.com/anharmuflih-stack/DPP4-virtual-screening)
+
 ---
 
 ## 1. Menjalankan Aplikasi Secara Lokal (Offline)
