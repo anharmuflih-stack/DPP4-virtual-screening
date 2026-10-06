@@ -234,7 +234,7 @@ def run_docking(pdbqt_ligand, protein):
 # ==========================================
 st.markdown("""
     <div class="header-title">
-        🧬 Dirof DPP-4 
+        🧬 DPP-4 Virtual Screener 
         <div class="header-subtitle">Computational Drug Discovery & Virtual Screening Laboratory</div>
     </div>
 """, unsafe_allow_html=True)
@@ -278,7 +278,7 @@ with col_result:
 </div>
 <div class="metric-box">
 <div class="data-label">ChEMBL ID</div>
-<div class="data-value" style="color: #0284c7;">- (Custom)</div>
+<div class="data-value" style="color: #0284c7;">-</div>
 </div>
 <div class="metric-box">
 <div class="data-label">Binding Affinity</div>
