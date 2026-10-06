@@ -63,9 +63,9 @@ def process_ligand(smiles):
     AllChem.MMFFOptimizeMolecule(mol)
     
     preparator = MoleculePreparation()
-    preparator.prepare(mol)
+    setup_list = preparator.prepare(mol)
     writer = PDBQTWriterLegacy()
-    pdbqt_string = writer.write_string(preparator.setup[0])
+    pdbqt_string = writer.write_string(setup_list[0])
     
     props = {
         'MW': round(Descriptors.MolWt(mol), 2),
