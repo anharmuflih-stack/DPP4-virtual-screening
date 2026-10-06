@@ -70,7 +70,10 @@ def dock():
         temp_out = os.path.join(project_root, 'results', 'flask_out.pdbqt')
         with open(temp_ligand, 'w') as f: f.write(pdbqt_ligand)
         
+        import platform
         vina_exec = os.path.join(project_root, 'scripts', 'vina')
+        if platform.system() == 'Linux':
+            vina_exec = os.path.join(project_root, 'scripts', 'vina_linux')
         receptor_path = os.path.join(project_root, 'data', '05_receptors_pdbqt', f"{protein}.pdbqt")
         
         targets = {
