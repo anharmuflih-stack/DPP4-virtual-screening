@@ -175,25 +175,41 @@ vina_exec = setup_vina()
 def get_chembl_data(mol):
     try:
         inchikey = Chem.MolToInchiKey(mol)
-        url = f"https://www.ebi.ac.uk/chembl/api/data/molecule.json?molecule_structures__standard_inchi_key={inchikey}"
-        
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
         
-        req = urllib.request.Request(url, headers={'Accept': 'application/json'})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
+        # Ambil Nama dan CID
+        url_props = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/property/Title/JSON"
+        req_props = urllib.request.Request(url_props, headers={'Accept': 'application/json'})
+        cid = "-"
+        name = "Novel Compound"
+        with urllib.request.urlopen(req_props, context=ctx, timeout=5) as response:
             data = json.loads(response.read().decode())
-            if data.get('molecules') and len(data['molecules']) > 0:
-                m = data['molecules'][0]
-                return {
-                    'id': m.get('molecule_chembl_id', 'Tidak Ditemukan'),
-                    'name': m.get('pref_name') or 'N/A',
-                    'phase': m.get('max_phase') or '0'
-                }
+            if 'PropertyTable' in data:
+                props = data['PropertyTable']['Properties'][0]
+                cid = str(props.get('CID', '-'))
+                name = props.get('Title', 'Novel Compound')
+                
+        # Ambil ChEMBL ID dari Sinonim
+        chembl_id = "-"
+        if cid != "-":
+            try:
+                url_syns = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/synonyms/JSON"
+                req_syns = urllib.request.Request(url_syns, headers={'Accept': 'application/json'})
+                with urllib.request.urlopen(req_syns, context=ctx, timeout=5) as response:
+                    data_syns = json.loads(response.read().decode())
+                    if 'InformationList' in data_syns:
+                        syns = data_syns['InformationList']['Information'][0].get('Synonym', [])
+                        chembl_list = [s for s in syns if s.startswith('CHEMBL') and 'SCHEMBL' not in s]
+                        if chembl_list:
+                            chembl_id = chembl_list[0]
+            except: pass
+            
+        return {'id': chembl_id, 'name': name, 'cid': cid}
     except Exception:
         pass
-    return {'id': 'Tidak Ditemukan', 'name': 'Novel Compound', 'phase': '-'}
+    return {'id': 'Tidak Ditemukan', 'name': 'Novel Compound', 'cid': '-'}
 
 def process_ligand(smiles):
     mol = Chem.MolFromSmiles(smiles)
@@ -219,7 +235,7 @@ def process_ligand(smiles):
         'Formula': Chem.rdMolDescriptors.CalcMolFormula(mol),
         'ChEMBL_ID': chembl_data['id'],
         'Name': chembl_data['name'],
-        'Phase': chembl_data['phase']
+        'CID': chembl_data['cid']
     }
     return pdbqt_string, props
 
@@ -323,8 +339,8 @@ with col_result:
 <div class="data-value" style="color: #0284c7;">{props['ChEMBL_ID']}</div>
 </div>
 <div class="metric-box">
-<div class="data-label">Clinical Phase</div>
-<div class="data-value" style="color: #10b981;">Phase {props['Phase']}</div>
+<div class="data-label">PubChem CID</div>
+<div class="data-value" style="color: #10b981;">{props['CID']}</div>
 </div>
 </div>
 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
