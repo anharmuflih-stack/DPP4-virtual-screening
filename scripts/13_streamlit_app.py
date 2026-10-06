@@ -171,7 +171,7 @@ vina_exec = setup_vina()
 # ==========================================
 # 3. FUNGSI PENCARIAN CHEMBL & DOCKING
 # ==========================================
-def get_chembl_id(smiles):
+def get_chembl_data(smiles):
     try:
         encoded = urllib.parse.quote(smiles)
         url = f"https://www.ebi.ac.uk/chembl/api/data/molecule.json?molecule_structures__canonical_smiles__flexmatch={encoded}"
@@ -179,10 +179,15 @@ def get_chembl_id(smiles):
         with urllib.request.urlopen(req, timeout=5) as response:
             data = json.loads(response.read().decode())
             if data.get('molecules') and len(data['molecules']) > 0:
-                return data['molecules'][0]['molecule_chembl_id']
+                mol = data['molecules'][0]
+                return {
+                    'id': mol.get('molecule_chembl_id', 'Tidak Ditemukan'),
+                    'name': mol.get('pref_name') or 'N/A',
+                    'phase': mol.get('max_phase') or '0'
+                }
     except Exception:
         pass
-    return "Tidak Ditemukan"
+    return {'id': 'Tidak Ditemukan', 'name': 'Novel Compound', 'phase': '-'}
 
 def process_ligand(smiles):
     mol = Chem.MolFromSmiles(smiles)
@@ -199,13 +204,16 @@ def process_ligand(smiles):
     result = writer.write_string(setup_list[0])
     pdbqt_string = result[0] if isinstance(result, tuple) else result
     
+    chembl_data = get_chembl_data(smiles)
     props = {
         'MW': round(Descriptors.MolWt(mol), 2),
         'LogP': round(Descriptors.MolLogP(mol), 2),
         'HBD': Descriptors.NumHDonors(mol),
         'HBA': Descriptors.NumHAcceptors(mol),
         'Formula': Chem.rdMolDescriptors.CalcMolFormula(mol),
-        'ChEMBL_ID': get_chembl_id(smiles)
+        'ChEMBL_ID': chembl_data['id'],
+        'Name': chembl_data['name'],
+        'Phase': chembl_data['phase']
     }
     return pdbqt_string, props
 
@@ -299,22 +307,32 @@ with col_result:
                 html_card = f"""
 <div class="science-card">
 <h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Properties & Identity</h3>
-<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
 <div class="metric-box">
-<div class="data-label">Chemical Formula</div>
-<div class="data-value">{props['Formula']}</div>
+<div class="data-label">Compound Name</div>
+<div class="data-value" style="font-size: 1rem; color: #475569;">{props['Name']}</div>
 </div>
 <div class="metric-box">
 <div class="data-label">ChEMBL ID</div>
 <div class="data-value" style="color: #0284c7;">{props['ChEMBL_ID']}</div>
 </div>
 <div class="metric-box">
-<div class="data-label">Best Affinity</div>
-<div class="data-value" style="color: #f43f5e;">{best_affinity} kcal/mol</div>
+<div class="data-label">Clinical Phase</div>
+<div class="data-value" style="color: #10b981;">Phase {props['Phase']}</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+<div class="metric-box">
+<div class="data-label">Chemical Formula</div>
+<div class="data-value">{props['Formula']}</div>
 </div>
 <div class="metric-box">
 <div class="data-label">Grid Center (X,Y,Z)</div>
 <div class="data-value" style="font-size: 0.95rem;">{center_xyz}</div>
+</div>
+<div class="metric-box">
+<div class="data-label">Best Affinity</div>
+<div class="data-value" style="color: #f43f5e;">{best_affinity} kcal/mol</div>
 </div>
 </div>
 <div class="data-label" style="margin-bottom: 1rem;">Lipinski's Rule of Five Analysis</div>
