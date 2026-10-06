@@ -1,56 +1,53 @@
 # 🧬 DPP-4 Virtual Screening - Petunjuk Penggunaan
 
-Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibitor reseptor *Dipeptidyl Peptidase-4 (DPP-4)*. Dokumen ini memuat panduan lengkap tentang cara menggunakan *software* dan mengoperasikan *website* simulasi yang telah dibangun menggunakan arsitektur web performa tinggi (Flask + UI TailwindCSS).
+Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibitor reseptor *Dipeptidyl Peptidase-4 (DPP-4)*. Dokumen ini memuat panduan lengkap tentang cara menggunakan *software* dan mengoperasikan *website* simulasi yang telah dibangun menggunakan mesin **Streamlit**.
 
-🌐 **Akses Website Publik (Live Hugging Face Spaces):** 
-*(Segera hadir setelah deploy)*
-
----
-
-## 1. Memulai Secara Lokal (Sekali Klik) - STANDAR INDUSTRI UI
-
-Jika Anda menggunakan Mac dan ingin segera menguji antarmuka 3D secara luring (lokal) dengan kecepatan instan:
-
-1. Buka aplikasi **Finder**.
-2. Masuk ke *folder* `dpp4_project/results/`.
-3. Klik ganda (*double-click*) pada file **`START_WEB_APP.command`**.
-4. Sebuah terminal kecil akan muncul, dan peramban web (*browser*) Anda akan langsung membuka alamat `http://localhost:8080`.
-5. Nikmati antarmuka UI murni yang sangat luwes dan interaktif.
-6. Jika sudah selesai, tutup jendela *browser* dan tekan `CTRL+C` di terminal kecil tersebut lalu tutup.
+🌐 **Akses Website Publik (Streamlit Cloud):** 
+[**https://dpp4virtualscreener.streamlit.app**](https://dpp4virtualscreener.streamlit.app)
 
 ---
 
-## 2. Publikasi ke Hugging Face Spaces (Gratis, Tanpa Kartu Kredit)
+## 1. Menjalankan Streamlit Secara Lokal (Offline)
 
-Untuk memamerkan *website* berarsitektur canggih ini ke internet, kita menggunakan **Hugging Face Spaces** yang mendukung teknologi Docker dan menyediakan komputasi bertenaga (RAM 16GB) secara gratis:
+Jika Anda ingin menjalankan atau menguji antarmuka Streamlit di komputer lokal (Mac) Anda:
 
-**Langkah 1: Siapkan Repositori**
-1. Buka [**huggingface.co/spaces**](https://huggingface.co/spaces) dan login/buat akun gratis.
-2. Klik tombol **Create new Space** di pojok kanan atas.
-3. Isi **Space Name** (misal: `Dirof-DPP4-Lab`).
-4. Pada bagian **Select the Space SDK**, pilih **Docker** (lalu pilih *Blank*).
-5. Pada bagian *Space Hardware*, pilih yang gratis (2 vCPU, 16GB RAM).
-6. Klik **Create Space**.
-
-**Langkah 2: Unggah Kode ke Peladen**
-Setelah *Space* Anda jadi, buka terminal di komputer Anda, pastikan Anda berada di direktori `dpp4_project`, lalu jalankan dua baris perintah ini:
-
-```bash
-git remote add hf https://huggingface.co/spaces/USERNAME_ANDA/NAMA_SPACE_ANDA
-git push hf main
-```
-*(Ganti tautan di atas dengan URL Git yang diberikan oleh layar Hugging Face Anda. Anda akan diminta memasukkan username & token/password).*
-
-Hugging Face akan secara otomatis membaca `Dockerfile` yang telah kami buatkan, menginstal Linux Vina, dan menyalakan *website* HTML orisinal Anda untuk dapat diakses oleh siapapun di seluruh dunia tanpa batas!
+1. Buka aplikasi **Terminal**.
+2. Masuk ke ruang kerja proyek Anda:
+   ```bash
+   cd /Users/aanmuf/drug_discovery/dpp4_project
+   ```
+3. Nyalakan mesin Streamlit dengan perintah:
+   ```bash
+   streamlit run scripts/13_streamlit_app.py
+   ```
+4. Jendela peramban web (*browser*) Anda akan otomatis terbuka dan menampilkan antarmuka aplikasi di port `8501`.
+5. Anda bisa mencoba melakukan *docking* dengan memasukkan kode SMILES.
+6. Untuk mematikan server lokal, tekan `CTRL+C` di Terminal.
 
 ---
 
-## 3. Struktur Data Proyek
+## 2. Publikasi ke Streamlit Community Cloud (Online)
+
+Untuk menjaga *website* Anda tetap mengudara di internet secara permanen dan gratis, ikuti langkah publikasi ke **Streamlit Cloud** berikut ini:
+
+1. Pastikan semua *update* atau perubahan kode terbaru sudah diunggah ke GitHub Anda (gunakan perintah `git push` di terminal).
+2. Kunjungi [**share.streamlit.io**](https://share.streamlit.io/) dan login menggunakan akun GitHub Anda.
+3. Klik tombol **New App**.
+4. Pilih repositori `dpp4_project` milik Anda dari daftar yang tersedia.
+5. Pada kolom **Main file path**, masukkan dengan teks berikut:
+   `scripts/13_streamlit_app.py`
+6. Klik **Deploy!**
+
+Server Streamlit Cloud (berbasis Linux) secara otomatis akan mengunduh aplikasi `vina_linux` melalui *script* yang telah disematkan, menyiapkan RDKit, dan memublikasikan 3D *viewer*-nya untuk bisa diakses publik.
+
+---
+
+## 3. Struktur Direktori Data
 
 - `data/01_raw/`: Berisi pangkalan data *raw* bioaktivitas dari ChEMBL.
 - `data/03_pdb/`: Struktur protein DPP-4 (3G0B & 5T4B) bersih yang telah disiapkan.
 - `data/04_ligands_pdbqt/`: Himpunan molekul siap tambat dalam format PDBQT.
-- `results/`: Seluruh catatan Log *docking* dan luaran konformasi molekul.
-- `scripts/`: Berisi *backend* Flask dan skrip otomatisasi laboratorium.
+- `results/`: Seluruh catatan Log *docking* dan luaran konformasi molekul (jika dijalankan dengan metode *batch*).
+- `scripts/`: Berisi seluruh mesin aplikasi web (`13_streamlit_app.py`) dan alat-alat otomatisasi lainnya.
 
-*Selamat melakukan eksplorasi dan penemuan obat baru dengan performa web modern!*
+*Selamat melakukan eksperimen, semoga penemuan obat Anda berhasil!*
