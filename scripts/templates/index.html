@@ -127,6 +127,10 @@
                             <p class="data-value text-sky-600 font-mono" id="r_chembl">-</p>
                         </div>
                         <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <p class="data-label">PubChem CID</p>
+                            <p class="data-value text-emerald-600 font-mono" id="r_cid">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
                             <p class="data-label">Chemical Formula</p>
                             <p class="data-value" id="r_formula">-</p>
                         </div>
@@ -229,6 +233,7 @@
                 // Populate Identity
                 document.getElementById('r_name').innerText = data.molecule.name;
                 document.getElementById('r_chembl').innerText = data.molecule.chembl_id;
+                document.getElementById('r_cid').innerText = data.molecule.cid;
                 document.getElementById('r_formula').innerText = data.molecule.formula;
                 document.getElementById('r_ic50').innerText = data.molecule.ic50;
                 document.getElementById('r_mw').innerText = data.molecule.mw;

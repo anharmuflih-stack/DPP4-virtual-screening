@@ -13,6 +13,7 @@ Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibit
 ## 1. Menjalankan Aplikasi Secara Lokal (Offline)
 
 Proyek ini menyediakan dua mode antarmuka untuk dijalankan secara lokal di komputer (Mac) Anda: **Mode Flask** (Desain orisinal) dan **Mode Streamlit**.
+> **Catatan Penting:** Kedua mode aplikasi ini telah terintegrasi secara *real-time* dengan mesin pelacak **PubChem PUG REST API** (Amerika Serikat) dan **EBI ChEMBL API** (Eropa). Pastikan komputer Anda terhubung dengan internet agar sistem dapat menarik data Nama Obat, PubChem CID, dan ChEMBL ID secara otomatis berdasarkan struktur molekul (*SMILES / InChIKey*) yang Anda masukkan.
 
 ### A. Mode Localhost Flask (Sekali Klik)
 Pilihan terbaik untuk merasakan antarmuka *Tailwind CSS* yang 100% mulus dan responsif.

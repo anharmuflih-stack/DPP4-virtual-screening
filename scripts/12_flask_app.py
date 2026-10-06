@@ -41,21 +41,36 @@ def dock():
         hbd = Descriptors.NumHDonors(mol)
         hba = Descriptors.NumHAcceptors(mol)
         
-        # Match ChEMBL ID
-        chembl_id = "Novel Compound"
-        ic50 = "Unknown"
-        pref_name = "Unnamed"
+        # PubChem InChIKey Lookup
+        inchikey = Chem.MolToInchiKey(mol)
+        chembl_id = "-"
+        pref_name = "Novel Compound"
+        cid = "-"
+        ic50 = "-"
         
         match = df_raw[df_raw['canonical_smiles'] == canonical]
         if not match.empty:
-            chembl_id = match.iloc[0]['molecule_chembl_id']
             ic50 = f"{match.iloc[0]['standard_value']} {match.iloc[0]['standard_units']}"
-            try:
-                resp = requests.get(f"https://www.ebi.ac.uk/chembl/api/data/molecule/{chembl_id}.json", timeout=3)
-                if resp.status_code == 200:
-                    pref_name = resp.json().get('pref_name') or "Unnamed"
-            except:
-                pass
+            
+        try:
+            # 1. Get Title and CID
+            resp = requests.get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/property/Title/JSON", timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                props = data['PropertyTable']['Properties'][0]
+                cid = str(props.get('CID', '-'))
+                pref_name = props.get('Title', 'Novel Compound')
+                
+            # 2. Get Synonyms for ChEMBL
+            if cid != "-":
+                resp_syn = requests.get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/synonyms/JSON", timeout=5)
+                if resp_syn.status_code == 200:
+                    syns = resp_syn.json()['InformationList']['Information'][0].get('Synonym', [])
+                    chembl_list = [s for s in syns if s.startswith('CHEMBL') and 'SCHEMBL' not in s]
+                    if chembl_list:
+                        chembl_id = chembl_list[0]
+        except Exception:
+            pass
                 
         # Docking
         mol = Chem.AddHs(mol)
@@ -116,6 +131,7 @@ def dock():
                 'smiles': canonical,
                 'formula': formula,
                 'chembl_id': chembl_id,
+                'cid': cid,
                 'name': pref_name,
                 'ic50': ic50,
                 'mw': round(mw, 2),
