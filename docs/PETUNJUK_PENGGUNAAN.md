@@ -7,10 +7,19 @@ Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibit
 
 ---
 
-## 1. Menjalankan Streamlit Secara Lokal (Offline)
+## 1. Menjalankan Aplikasi Secara Lokal (Offline)
 
-Jika Anda ingin menjalankan atau menguji antarmuka Streamlit di komputer lokal (Mac) Anda:
+Proyek ini menyediakan dua mode antarmuka untuk dijalankan secara lokal di komputer (Mac) Anda: **Mode Flask** (Desain orisinal) dan **Mode Streamlit**.
 
+### A. Mode Localhost Flask (Sekali Klik)
+Pilihan terbaik untuk merasakan antarmuka *Tailwind CSS* yang 100% mulus dan responsif.
+1. Buka aplikasi **Finder**.
+2. Masuk ke *folder* `dpp4_project/results/`.
+3. Klik ganda (*double-click*) pada file **`START_WEB_APP.command`**.
+4. Sebuah terminal kecil akan muncul, dan peramban web (*browser*) Anda akan langsung membuka alamat `http://localhost:8080`.
+5. Untuk mematikan server, tutup jendela *browser* dan tekan `CTRL+C` di terminal kecil tersebut.
+
+### B. Mode Streamlit Lokal
 1. Buka aplikasi **Terminal**.
 2. Masuk ke ruang kerja proyek Anda:
    ```bash
@@ -21,8 +30,7 @@ Jika Anda ingin menjalankan atau menguji antarmuka Streamlit di komputer lokal (
    streamlit run scripts/13_streamlit_app.py
    ```
 4. Jendela peramban web (*browser*) Anda akan otomatis terbuka dan menampilkan antarmuka aplikasi di port `8501`.
-5. Anda bisa mencoba melakukan *docking* dengan memasukkan kode SMILES.
-6. Untuk mematikan server lokal, tekan `CTRL+C` di Terminal.
+5. Untuk mematikan server lokal, tekan `CTRL+C` di Terminal.
 
 ---
 
