@@ -54,7 +54,7 @@ def dock():
             
         try:
             # 1. Get Title and CID
-            resp = requests.get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/property/Title/JSON", timeout=5)
+            resp = requests.get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/property/Title/JSON", timeout=5, verify=False)
             if resp.status_code == 200:
                 data = resp.json()
                 props = data['PropertyTable']['Properties'][0]
@@ -63,7 +63,7 @@ def dock():
                 
             # 2. Get Synonyms for ChEMBL
             if cid != "-":
-                resp_syn = requests.get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/synonyms/JSON", timeout=5)
+                resp_syn = requests.get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/synonyms/JSON", timeout=5, verify=False)
                 if resp_syn.status_code == 200:
                     syns = resp_syn.json()['InformationList']['Information'][0].get('Synonym', [])
                     chembl_list = [s for s in syns if s.startswith('CHEMBL') and 'SCHEMBL' not in s]
