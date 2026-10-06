@@ -273,11 +273,17 @@ with col_result:
                 c_hbd = "lipinski-fail" if props['HBD'] > 5 else ""
                 c_hba = "lipinski-fail" if props['HBA'] > 10 else ""
                 
+                targets = {
+                    '3G0B': {'center': (42.05, 34.29, 14.62)},
+                    '5T4B': {'center': (37.61, 49.92, 40.33)}
+                }
+                center_xyz = f"{targets[protein_target]['center'][0]}, {targets[protein_target]['center'][1]}, {targets[protein_target]['center'][2]}"
+                
                 # Kartu 1: Identitas & Properti (HTML rata kiri absolut)
                 html_card = f"""
 <div class="science-card">
 <h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Properties & Identity</h3>
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
 <div class="metric-box">
 <div class="data-label">Chemical Formula</div>
 <div class="data-value">{props['Formula']}</div>
@@ -287,8 +293,12 @@ with col_result:
 <div class="data-value" style="color: #0284c7;">-</div>
 </div>
 <div class="metric-box">
-<div class="data-label">Binding Affinity</div>
+<div class="data-label">Best Affinity</div>
 <div class="data-value" style="color: #f43f5e;">{best_affinity} kcal/mol</div>
+</div>
+<div class="metric-box">
+<div class="data-label">Grid Center (X,Y,Z)</div>
+<div class="data-value" style="font-size: 0.95rem;">{center_xyz}</div>
 </div>
 </div>
 <div class="data-label" style="margin-bottom: 1rem;">Lipinski's Rule of Five Analysis</div>
