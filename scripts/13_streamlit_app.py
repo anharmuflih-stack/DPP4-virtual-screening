@@ -11,45 +11,126 @@ from meeko import MoleculePreparation, PDBQTWriterLegacy
 from stmol import showmol
 import py3Dmol
 
-st.set_page_config(page_title="🧬 DPP-4 Virtual Screening", page_icon="🧬", layout="wide")
+# Set konfigurasi halaman lebar penuh dengan tema cerah
+st.set_page_config(page_title="Dirof DPP-4", page_icon="🧬", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# 1. SETUP LINGKUNGAN & VINA
+# 1. INJEKSI CSS CUSTOM (Gaya Clean Lab dari Localhost)
 # ==========================================
-st.title("🧬 DPP-4 Virtual Screening")
-st.markdown("Platform komputasional penemuan obat untuk reseptor *Dipeptidyl Peptidase-4*.")
+st.markdown("""
+    <style>
+        /* Mengubah font utama */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap');
+        
+        html, body, [class*="css"]  {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Tema Background Slate 100 */
+        .stApp {
+            background-color: #f1f5f9; 
+            color: #334155;
+        }
+        
+        /* Menyembunyikan elemen bawaan Streamlit yang mengganggu */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        
+        /* Gaya Kartu Sains (Science Card) */
+        .science-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Gaya Teks */
+        .data-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .data-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* Header Kustom */
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            margin-top: -2rem;
+        }
+        .header-subtitle {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+        
+        /* Metrik Grid HTML */
+        .metric-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .lipinski-box {
+            border-left: 4px solid #10b981; /* Emerald green (Pass) */
+            padding-left: 0.75rem;
+        }
+        .lipinski-fail {
+            border-left: 4px solid #f43f5e; /* Rose red (Fail) */
+        }
+        
+        /* Modifikasi Tombol Streamlit */
+        .stButton>button {
+            width: 100%;
+            background-color: #0284c7 !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 0.375rem !important;
+            border: none !important;
+            padding: 0.6rem !important;
+            transition: all 0.2s !important;
+        }
+        .stButton>button:hover {
+            background-color: #0369a1 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
+# ==========================================
+# 2. SETUP DIREKTORI & VINA
+# ==========================================
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 data_dir = os.path.join(project_root, 'data')
 bin_dir = os.path.join(project_root, 'scripts')
 
-# Fungsi mendownload Vina jika berjalan di Linux (Streamlit Cloud)
 @st.cache_resource
 def setup_vina():
     is_linux = platform.system() == 'Linux'
     vina_exec = os.path.join(bin_dir, 'vina_linux' if is_linux else 'vina')
     
     if is_linux and not os.path.exists(vina_exec):
-        st.info("Mengunduh modul AutoDock Vina untuk server Linux...")
         url = "https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.5/vina_1.2.5_linux_x86_64"
         urllib.request.urlretrieve(url, vina_exec)
         os.chmod(vina_exec, 0o755)
     return vina_exec
 
 vina_exec = setup_vina()
-
-# ==========================================
-# 2. UI SIDEBAR
-# ==========================================
-st.sidebar.header("Konfigurasi Simulasi")
-protein_target = st.sidebar.selectbox("Pilih Target Protein (Receptor)", ["3G0B", "5T4B"])
-smiles_input = st.sidebar.text_input("SMILES Senyawa", "CC(C)[C@H](N)C(=O)N1CCCC1")
-run_btn = st.sidebar.button("Mulai Docking Vina", type="primary")
-
-targets = {
-    '3G0B': {'center': (42.05, 34.29, 14.62), 'size': (18, 18, 18)},
-    '5T4B': {'center': (37.61, 49.92, 40.33), 'size': (18, 16, 23)}
-}
 
 # ==========================================
 # 3. FUNGSI LOGIKA DOCKING
@@ -66,7 +147,6 @@ def process_ligand(smiles):
     setup_list = preparator.prepare(mol)
     writer = PDBQTWriterLegacy()
     
-    # Pada Meeko v0.5+, write_string mengembalikan tuple (string, warnings)
     result = writer.write_string(setup_list[0])
     pdbqt_string = result[0] if isinstance(result, tuple) else result
     
@@ -74,11 +154,17 @@ def process_ligand(smiles):
         'MW': round(Descriptors.MolWt(mol), 2),
         'LogP': round(Descriptors.MolLogP(mol), 2),
         'HBD': Descriptors.NumHDonors(mol),
-        'HBA': Descriptors.NumHAcceptors(mol)
+        'HBA': Descriptors.NumHAcceptors(mol),
+        'Formula': Chem.rdMolDescriptors.CalcMolFormula(mol)
     }
     return pdbqt_string, props
 
 def run_docking(pdbqt_ligand, protein):
+    targets = {
+        '3G0B': {'center': (42.05, 34.29, 14.62), 'size': (18, 18, 18)},
+        '5T4B': {'center': (37.61, 49.92, 40.33), 'size': (18, 16, 23)}
+    }
+    
     with tempfile.NamedTemporaryFile(delete=False, suffix='.pdbqt') as lig_file:
         lig_file.write(pdbqt_ligand.encode('utf-8'))
         lig_path = lig_file.name
@@ -110,52 +196,122 @@ def run_docking(pdbqt_ligand, protein):
     return affinity, out_content
 
 # ==========================================
-# 4. EKSEKUSI & VISUALISASI
+# 4. TATA LETAK UI (Meniru HTML)
 # ==========================================
-if run_btn:
-    with st.spinner("Memproses Ligan dan Menjalankan Docking..."):
-        ligand_pdbqt, props = process_ligand(smiles_input)
-        
-        if not ligand_pdbqt:
-            st.error(props) # Menampilkan pesan error SMILES
-        else:
-            col1, col2 = st.columns([1, 2])
+st.markdown("""
+    <div class="header-title">
+        🧬 Dirof DPP-4 
+        <div class="header-subtitle">Computational Drug Discovery & Virtual Screening Laboratory</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Layout Grid (mirip cols lg:col-span-1 & lg:col-span-3)
+col_input, col_result = st.columns([1, 2.5], gap="large")
+
+with col_input:
+    st.markdown('<div class="science-card">', unsafe_allow_html=True)
+    st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem;">Analysis Setup</h3>', unsafe_allow_html=True)
+    
+    protein_target = st.selectbox("Receptor Model", ["3G0B", "5T4B"], help="Pilih resolusi target protein")
+    smiles_input = st.text_input("Ligand Structure (SMILES)", "CC(C)[C@H](N)C(=O)N1CCCC1")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    run_btn = st.button("Run AutoDock Vina")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col_result:
+    if run_btn:
+        with st.spinner("Mengalkulasi Interaksi Molekuler..."):
+            ligand_pdbqt, props = process_ligand(smiles_input)
             
-            with col1:
-                st.subheader("Aturan Lipinski (Ro5)")
-                st.metric("Molecular Weight", f"{props['MW']} Da", "≤ 500", delta_color="inverse" if props['MW']>500 else "normal")
-                st.metric("LogP (Lipofilisitas)", props['LogP'], "≤ 5", delta_color="inverse" if props['LogP']>5 else "normal")
-                st.metric("H-Bond Donors", props['HBD'], "≤ 5", delta_color="inverse" if props['HBD']>5 else "normal")
-                st.metric("H-Bond Acceptors", props['HBA'], "≤ 10", delta_color="inverse" if props['HBA']>10 else "normal")
-            
-            # Jalankan Docking
-            affinity, docked_pdbqt = run_docking(ligand_pdbqt, protein_target)
-            
-            with col2:
-                st.success(f"**Docking Berhasil!** Binding Affinity Terbaik: **{affinity} kcal/mol**")
+            if not ligand_pdbqt:
+                st.error("Gagal: SMILES tidak valid.")
+            else:
+                affinity, docked_pdbqt = run_docking(ligand_pdbqt, protein_target)
                 
-                # Visualisasi 3D dengan Py3DMol via stmol
-                st.subheader("Interaksi Molekuler 3D")
-                view = py3Dmol.view(width=800, height=500)
-                view.setBackgroundColor('#1e293b')
+                # Kartu 1: Identitas & Properti
+                st.markdown('<div class="science-card">', unsafe_allow_html=True)
+                st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Properties & Identity</h3>', unsafe_allow_html=True)
                 
-                # Muat Protein
+                # Grid Baris 1: ID
+                st.markdown(f"""
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="metric-box">
+                        <div class="data-label">Chemical Formula</div>
+                        <div class="data-value">{props['Formula']}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="data-label">ChEMBL ID</div>
+                        <div class="data-value" style="color: #0284c7;">- (Custom)</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="data-label">Binding Affinity</div>
+                        <div class="data-value" style="color: #f43f5e;">{affinity} kcal/mol</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Grid Baris 2: Lipinski
+                st.markdown('<div class="data-label" style="margin-bottom: 1rem;">Lipinski\'s Rule of Five Analysis</div>', unsafe_allow_html=True)
+                
+                # Cek batas Lipinski
+                c_mw = "lipinski-fail" if props['MW'] > 500 else ""
+                c_logp = "lipinski-fail" if props['LogP'] > 5 else ""
+                c_hbd = "lipinski-fail" if props['HBD'] > 5 else ""
+                c_hba = "lipinski-fail" if props['HBA'] > 10 else ""
+                
+                st.markdown(f"""
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                    <div class="lipinski-box {c_mw}">
+                        <div style="font-size: 0.7rem; color: #64748b;">Molecular Weight</div>
+                        <div class="data-value" style="font-size: 1rem;">{props['MW']} <span style="font-size: 0.7rem; color:#94a3b8; font-weight:normal;">Da</span></div>
+                    </div>
+                    <div class="lipinski-box {c_logp}">
+                        <div style="font-size: 0.7rem; color: #64748b;">LogP</div>
+                        <div class="data-value" style="font-size: 1rem;">{props['LogP']}</div>
+                    </div>
+                    <div class="lipinski-box {c_hbd}">
+                        <div style="font-size: 0.7rem; color: #64748b;">H-Bond Donors</div>
+                        <div class="data-value" style="font-size: 1rem;">{props['HBD']}</div>
+                    </div>
+                    <div class="lipinski-box {c_hba}">
+                        <div style="font-size: 0.7rem; color: #64748b;">H-Bond Acceptors</div>
+                        <div class="data-value" style="font-size: 1rem;">{props['HBA']}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+                # Kartu 2: Interaksi 3D
+                st.markdown('<div class="science-card">', unsafe_allow_html=True)
+                st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Interaction Analysis</h3>', unsafe_allow_html=True)
+                
+                view = py3Dmol.view(width="100%", height=450)
+                view.setBackgroundColor('#1e293b') # Dark slate background for contrast
+                
+                # Add Protein
                 receptor_pdb = os.path.join(data_dir, '03_pdb', f"{protein_target}_clean.pdb")
                 with open(receptor_pdb, 'r') as f:
                     view.addModel(f.read(), 'pdb')
-                view.setStyle({'model': 0}, {'cartoon': {'color': '#cbd5e1', 'style': 'oval', 'opacity': 0.8}})
                 
-                # Muat Ligan Hasil Docking
+                # Add Ligand
                 view.addModel(docked_pdbqt, 'pdbqt')
-                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'cyanCarbon', 'radius': 0.2}})
                 
-                # Interaksi (Residu 5 Angstrom)
-                view.addStyle({'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}}, 
-                              {'stick': {'colorscheme': 'whiteCarbon', 'radius': 0.15}})
+                # Styles (Identik dengan versi HTML)
+                view.setStyle({'model': 0}, {'cartoon': {'color': '#cbd5e1', 'style': 'oval', 'thickness': 0.2, 'opacity': 0.85}})
+                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'cyanCarbon', 'radius': 0.15}, 'sphere': {'colorscheme': 'cyanCarbon', 'radius': 0.4}})
                 
-                # Surface Kantong Ikatan
-                view.addSurface(py3Dmol.VDW, {'opacity': 0.4, 'color': '#38bdf8'}, 
+                # Interacting Residues & Surface
+                view.addStyle({'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}}, {'stick': {'colorscheme': 'lightgreyCarbon', 'radius': 0.15}})
+                view.addSurface(py3Dmol.VDW, {'opacity': 0.3, 'color': '#38bdf8'}, 
+                                {'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}},
                                 {'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}})
                 
                 view.zoomTo({'model': 1})
-                showmol(view, height=500, width=800)
+                showmol(view, height=450, width="100%")
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        # Tampilan kosong di awal
+        st.info("👈 Masukkan struktur SMILES dan pilih model protein di panel sebelah kiri untuk memulai penapisan (*screening*).")
