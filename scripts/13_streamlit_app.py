@@ -26,6 +26,14 @@ st.markdown("""
             font-family: 'Inter', sans-serif;
         }
         
+        /* Menghilangkan ruang kosong berlebih di atas halaman */
+        .block-container {
+            padding-top: 1rem !important;
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+            max-width: 90% !important;
+        }
+        
         /* Tema Background Slate 100 */
         .stApp {
             background-color: #f1f5f9; 
@@ -33,9 +41,9 @@ st.markdown("""
         }
         
         /* Menyembunyikan elemen bawaan Streamlit yang mengganggu */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        header {visibility: hidden !important;}
+        #MainMenu {visibility: hidden !important;}
+        footer {visibility: hidden !important;}
         
         /* Gaya Kartu Sains (Science Card) */
         .science-card {
@@ -45,6 +53,23 @@ st.markdown("""
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+        }
+        
+        /* Mengganti desain Input bawaan Streamlit (Mirip Tailwind) */
+        div[data-baseweb="select"] > div, 
+        div[data-baseweb="input"] > div {
+            background-color: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.375rem !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        label[data-testid="stWidgetLabel"] p {
+            font-size: 0.75rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            color: #64748b !important;
+            font-weight: 600 !important;
         }
         
         /* Gaya Teks */
@@ -71,12 +96,14 @@ st.markdown("""
             border-bottom: 1px solid #cbd5e1;
             padding-bottom: 1rem;
             margin-bottom: 2rem;
-            margin-top: -2rem;
+            display: flex;
+            align-items: center;
         }
         .header-subtitle {
             font-size: 1rem;
             color: #64748b;
             font-weight: 400;
+            margin-top: 0.25rem;
         }
         
         /* Metrik Grid HTML */
@@ -95,19 +122,26 @@ st.markdown("""
             border-left: 4px solid #f43f5e; /* Rose red (Fail) */
         }
         
-        /* Modifikasi Tombol Streamlit */
-        .stButton>button {
-            width: 100%;
+        /* Modifikasi Tombol Streamlit secara Ekstrem */
+        div[data-testid="stButton"] > button {
+            width: 100% !important;
             background-color: #0284c7 !important;
             color: white !important;
             font-weight: 600 !important;
             border-radius: 0.375rem !important;
             border: none !important;
             padding: 0.6rem !important;
+            height: 3rem !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
             transition: all 0.2s !important;
         }
-        .stButton>button:hover {
+        div[data-testid="stButton"] > button:hover {
             background-color: #0369a1 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        div[data-testid="stSpinner"] > div {
+            border-color: #0284c7 transparent transparent transparent !important;
         }
     </style>
 """, unsafe_allow_html=True)
