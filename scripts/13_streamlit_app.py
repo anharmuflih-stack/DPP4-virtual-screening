@@ -284,10 +284,15 @@ def run_docking(pdbqt_ligand, protein):
 # 4. TATA LETAK UI (Meniru HTML)
 # ==========================================
 st.markdown("""
-    <div class="header-title">
-        🧬 DPP-4 Virtual Screener 
-        <div class="header-subtitle">Computational Drug Discovery & Virtual Screening Laboratory</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1.5rem;">
+    <div style="background: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); font-size: 2.2rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.75rem;">
+        <span>🧬</span>
+        <span>DPP-4 Virtual Screener</span>
     </div>
+    <div style="font-size: 1.1rem; font-weight: 500; color: #64748b; line-height: 1.4; max-width: 400px;">
+        Computational Drug Discovery &<br>Virtual Screening Laboratory
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
 # Layout Grid (mirip cols lg:col-span-1 & lg:col-span-3)
