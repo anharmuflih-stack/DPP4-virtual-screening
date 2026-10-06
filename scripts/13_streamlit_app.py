@@ -4,6 +4,8 @@ import platform
 import subprocess
 import tempfile
 import urllib.request
+import urllib.parse
+import json
 import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Descriptors, AllChem
@@ -167,8 +169,21 @@ def setup_vina():
 vina_exec = setup_vina()
 
 # ==========================================
-# 3. FUNGSI LOGIKA DOCKING
+# 3. FUNGSI PENCARIAN CHEMBL & DOCKING
 # ==========================================
+def get_chembl_id(smiles):
+    try:
+        encoded = urllib.parse.quote(smiles)
+        url = f"https://www.ebi.ac.uk/chembl/api/data/molecule.json?molecule_structures__canonical_smiles__flexmatch={encoded}"
+        req = urllib.request.Request(url, headers={'Accept': 'application/json'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode())
+            if data.get('molecules') and len(data['molecules']) > 0:
+                return data['molecules'][0]['molecule_chembl_id']
+    except Exception:
+        pass
+    return "Tidak Ditemukan"
+
 def process_ligand(smiles):
     mol = Chem.MolFromSmiles(smiles)
     if not mol: return None, "SMILES tidak valid"
@@ -189,7 +204,8 @@ def process_ligand(smiles):
         'LogP': round(Descriptors.MolLogP(mol), 2),
         'HBD': Descriptors.NumHDonors(mol),
         'HBA': Descriptors.NumHAcceptors(mol),
-        'Formula': Chem.rdMolDescriptors.CalcMolFormula(mol)
+        'Formula': Chem.rdMolDescriptors.CalcMolFormula(mol),
+        'ChEMBL_ID': get_chembl_id(smiles)
     }
     return pdbqt_string, props
 
@@ -290,7 +306,7 @@ with col_result:
 </div>
 <div class="metric-box">
 <div class="data-label">ChEMBL ID</div>
-<div class="data-value" style="color: #0284c7;">-</div>
+<div class="data-value" style="color: #0284c7;">{props['ChEMBL_ID']}</div>
 </div>
 <div class="metric-box">
 <div class="data-label">Best Affinity</div>
