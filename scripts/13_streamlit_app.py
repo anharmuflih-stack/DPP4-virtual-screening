@@ -243,15 +243,13 @@ st.markdown("""
 col_input, col_result = st.columns([1, 2.5], gap="large")
 
 with col_input:
-    st.markdown('<div class="science-card">', unsafe_allow_html=True)
-    st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem;">Analysis Setup</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Analysis Setup</h3>', unsafe_allow_html=True)
     
     protein_target = st.selectbox("Receptor Model", ["3G0B", "5T4B"], help="Pilih resolusi target protein")
     smiles_input = st.text_input("Ligand Structure (SMILES)", "CC(C)[C@H](N)C(=O)N1CCCC1")
     
     st.markdown("<br>", unsafe_allow_html=True)
     run_btn = st.button("Run AutoDock Vina")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 with col_result:
     if run_btn:
@@ -263,63 +261,61 @@ with col_result:
             else:
                 affinity, docked_pdbqt = run_docking(ligand_pdbqt, protein_target)
                 
-                # Kartu 1: Identitas & Properti
-                st.markdown('<div class="science-card">', unsafe_allow_html=True)
-                st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Properties & Identity</h3>', unsafe_allow_html=True)
-                
-                # Grid Baris 1: ID
-                st.markdown(f"""
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                    <div class="metric-box">
-                        <div class="data-label">Chemical Formula</div>
-                        <div class="data-value">{props['Formula']}</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="data-label">ChEMBL ID</div>
-                        <div class="data-value" style="color: #0284c7;">- (Custom)</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="data-label">Binding Affinity</div>
-                        <div class="data-value" style="color: #f43f5e;">{affinity} kcal/mol</div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Grid Baris 2: Lipinski
-                st.markdown('<div class="data-label" style="margin-bottom: 1rem;">Lipinski\'s Rule of Five Analysis</div>', unsafe_allow_html=True)
-                
                 # Cek batas Lipinski
                 c_mw = "lipinski-fail" if props['MW'] > 500 else ""
                 c_logp = "lipinski-fail" if props['LogP'] > 5 else ""
                 c_hbd = "lipinski-fail" if props['HBD'] > 5 else ""
                 c_hba = "lipinski-fail" if props['HBA'] > 10 else ""
                 
+                # Kartu 1: Identitas & Properti (Satu Blok HTML Penuh)
                 st.markdown(f"""
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
-                    <div class="lipinski-box {c_mw}">
-                        <div style="font-size: 0.7rem; color: #64748b;">Molecular Weight</div>
-                        <div class="data-value" style="font-size: 1rem;">{props['MW']} <span style="font-size: 0.7rem; color:#94a3b8; font-weight:normal;">Da</span></div>
+                <div class="science-card">
+                    <h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Properties & Identity</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="metric-box">
+                            <div class="data-label">Chemical Formula</div>
+                            <div class="data-value">{props['Formula']}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="data-label">ChEMBL ID</div>
+                            <div class="data-value" style="color: #0284c7;">- (Custom)</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="data-label">Binding Affinity</div>
+                            <div class="data-value" style="color: #f43f5e;">{affinity} kcal/mol</div>
+                        </div>
                     </div>
-                    <div class="lipinski-box {c_logp}">
-                        <div style="font-size: 0.7rem; color: #64748b;">LogP</div>
-                        <div class="data-value" style="font-size: 1rem;">{props['LogP']}</div>
-                    </div>
-                    <div class="lipinski-box {c_hbd}">
-                        <div style="font-size: 0.7rem; color: #64748b;">H-Bond Donors</div>
-                        <div class="data-value" style="font-size: 1rem;">{props['HBD']}</div>
-                    </div>
-                    <div class="lipinski-box {c_hba}">
-                        <div style="font-size: 0.7rem; color: #64748b;">H-Bond Acceptors</div>
-                        <div class="data-value" style="font-size: 1rem;">{props['HBA']}</div>
+                    
+                    <div class="data-label" style="margin-bottom: 1rem;">Lipinski's Rule of Five Analysis</div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                        <div class="lipinski-box {c_mw}">
+                            <div style="font-size: 0.7rem; color: #64748b;">Molecular Weight</div>
+                            <div class="data-value" style="font-size: 1rem;">{props['MW']} <span style="font-size: 0.7rem; color:#94a3b8; font-weight:normal;">Da</span></div>
+                        </div>
+                        <div class="lipinski-box {c_logp}">
+                            <div style="font-size: 0.7rem; color: #64748b;">LogP</div>
+                            <div class="data-value" style="font-size: 1rem;">{props['LogP']}</div>
+                        </div>
+                        <div class="lipinski-box {c_hbd}">
+                            <div style="font-size: 0.7rem; color: #64748b;">H-Bond Donors</div>
+                            <div class="data-value" style="font-size: 1rem;">{props['HBD']}</div>
+                        </div>
+                        <div class="lipinski-box {c_hba}">
+                            <div style="font-size: 0.7rem; color: #64748b;">H-Bond Acceptors</div>
+                            <div class="data-value" style="font-size: 1rem;">{props['HBA']}</div>
+                        </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                st.markdown('</div>', unsafe_allow_html=True)
-                
-                # Kartu 2: Interaksi 3D
-                st.markdown('<div class="science-card">', unsafe_allow_html=True)
-                st.markdown('<h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Molecular Interaction Analysis</h3>', unsafe_allow_html=True)
+                # Kartu 2: Interaksi 3D (Hanya Title yang dibungkus HTML)
+                st.markdown("""
+                <div style="margin-top: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    <h3 style="color: #0f172a; font-size: 1.1rem; margin: 0;">Molecular Interaction Analysis</h3>
+                </div>
+                """, unsafe_allow_html=True)
                 
                 view = py3Dmol.view(width="100%", height=450)
                 view.setBackgroundColor('#1e293b') # Dark slate background for contrast
@@ -344,8 +340,6 @@ with col_result:
                 
                 view.zoomTo({'model': 1})
                 showmol(view, height=450, width="100%")
-                
-                st.markdown('</div>', unsafe_allow_html=True)
     else:
         # Tampilan kosong di awal
         st.info("👈 Masukkan struktur SMILES dan pilih model protein di panel sebelah kiri untuk memulai penapisan (*screening*).")
