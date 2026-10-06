@@ -2,6 +2,9 @@
 
 Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibitor reseptor *Dipeptidyl Peptidase-4 (DPP-4)*. Dokumen ini memuat panduan lengkap tentang cara menggunakan *software* dan mengoperasikan *website* simulasi yang telah dibangun.
 
+🌐 **Akses Website Publik (Live):** 
+[**https://dpp4virtualscreener.streamlit.app**](https://dpp4virtualscreener.streamlit.app)
+
 ---
 
 ## 1. Memulai Secara Lokal (Sekali Klik)
