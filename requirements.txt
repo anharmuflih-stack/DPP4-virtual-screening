@@ -3,3 +3,5 @@ rdkit
 meeko
 pandas
 stmol
+scipy
+numpy
