@@ -214,20 +214,25 @@ def run_docking(pdbqt_ligand, protein):
         '--size_x', str(targets[protein]['size'][0]),
         '--size_y', str(targets[protein]['size'][1]),
         '--size_z', str(targets[protein]['size'][2]),
-        '--exhaustiveness', '4', '--num_modes', '1'
+        '--exhaustiveness', '8', '--num_modes', '5'
     ]
     
     subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-    affinity = 0.0
+    poses = []
     with open(out_path, 'r') as f:
         out_content = f.read()
         for line in out_content.split('\n'):
             if line.startswith('REMARK VINA RESULT:'):
-                affinity = float(line.split()[3])
-                break
+                parts = line.split()
+                poses.append({
+                    'Pose': len(poses) + 1,
+                    'Affinity (kcal/mol)': float(parts[3]),
+                    'RMSD l.b. (Å)': float(parts[4]),
+                    'RMSD u.b. (Å)': float(parts[5])
+                })
                 
-    return affinity, out_content
+    return poses, out_content
 
 # ==========================================
 # 4. TATA LETAK UI (Meniru HTML)
@@ -259,7 +264,8 @@ with col_result:
             if not ligand_pdbqt:
                 st.error("Gagal: SMILES tidak valid.")
             else:
-                affinity, docked_pdbqt = run_docking(ligand_pdbqt, protein_target)
+                poses, docked_pdbqt = run_docking(ligand_pdbqt, protein_target)
+                best_affinity = poses[0]['Affinity (kcal/mol)'] if poses else 0.0
                 
                 # Cek batas Lipinski
                 c_mw = "lipinski-fail" if props['MW'] > 500 else ""
@@ -282,7 +288,7 @@ with col_result:
 </div>
 <div class="metric-box">
 <div class="data-label">Binding Affinity</div>
-<div class="data-value" style="color: #f43f5e;">{affinity} kcal/mol</div>
+<div class="data-value" style="color: #f43f5e;">{best_affinity} kcal/mol</div>
 </div>
 </div>
 <div class="data-label" style="margin-bottom: 1rem;">Lipinski's Rule of Five Analysis</div>
@@ -308,6 +314,13 @@ with col_result:
 """
                 st.markdown(html_card, unsafe_allow_html=True)
                 
+                # Tabel Top Poses
+                if poses:
+                    st.markdown('<div class="science-card"><h3 style="color: #0f172a; font-size: 1.1rem; margin-bottom: 1rem;">Docking Conformational Poses (Top 5)</h3>', unsafe_allow_html=True)
+                    df_poses = pd.DataFrame(poses)
+                    st.dataframe(df_poses.style.highlight_min(subset=['Affinity (kcal/mol)'], color='#fca5a5'), use_container_width=True, hide_index=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
+                
                 # Kartu 2: Interaksi 3D (Hanya Title yang dibungkus HTML)
                 html_title = """
 <div style="margin-top: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem;">
@@ -327,15 +340,15 @@ with col_result:
                 # Add Ligand
                 view.addModel(docked_pdbqt, 'pdbqt')
                 
-                # Styles (Identik dengan versi HTML)
-                view.setStyle({'model': 0}, {'cartoon': {'color': '#cbd5e1', 'style': 'oval', 'thickness': 0.2, 'opacity': 0.85}})
-                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'cyanCarbon', 'radius': 0.15}, 'sphere': {'colorscheme': 'cyanCarbon', 'radius': 0.4}})
+                # Styles (Lebih kontras dan jelas)
+                view.setStyle({'model': 0}, {'cartoon': {'color': 'white', 'style': 'oval', 'thickness': 0.2, 'opacity': 0.9}})
+                view.setStyle({'model': 1}, {'stick': {'colorscheme': 'greenCarbon', 'radius': 0.2}, 'sphere': {'colorscheme': 'greenCarbon', 'radius': 0.4}})
                 
-                # Interacting Residues & Surface
-                view.addStyle({'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}}, {'stick': {'colorscheme': 'lightgreyCarbon', 'radius': 0.15}})
-                view.addSurface(py3Dmol.VDW, {'opacity': 0.3, 'color': '#38bdf8'}, 
-                                {'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}},
-                                {'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}})
+                # Interacting Residues & Surface (Jarak 4 Angstrom, Warna Cyan Terang, plus Label)
+                interaction_sel = {'model': 0, 'within': {'distance': 4.0, 'sel': {'model': 1}}}
+                view.addStyle(interaction_sel, {'stick': {'colorscheme': 'cyanCarbon', 'radius': 0.15}})
+                view.addResLabels(interaction_sel, {'fontOpacity': 0.9, 'fontSize': 13, 'fontColor': 'black', 'backgroundColor': '#f8fafc', 'showBackground': True})
+                view.addSurface(py3Dmol.VDW, {'opacity': 0.25, 'color': '#0ea5e9'}, interaction_sel, interaction_sel)
                 
                 view.zoomTo({'model': 1})
                 showmol(view, height=450, width="100%")
