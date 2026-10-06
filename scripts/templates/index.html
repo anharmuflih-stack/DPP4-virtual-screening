@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dirof DPP-4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Slate 100 - Clean lab feel */
+            color: #334155; /* Slate 700 */
+        }
+        .mono { font-family: 'Fira Code', monospace; }
+        
+        .science-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .science-header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+        }
+
+        .data-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 600;
+        }
+        
+        .data-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .btn-primary {
+            background-color: #0284c7; /* Sky 600 */
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover { background-color: #0369a1; /* Sky 700 */ }
+        
+        .btn-primary:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .loader {
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top: 3px solid #0284c7;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex items-center justify-between border-b border-slate-300 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800 flex items-center">
+                    <svg class="w-8 h-8 text-sky-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    Dirof DPP-4
+                </h1>
+                <p class="text-slate-500 mt-1">Computational Drug Discovery & Virtual Screening Laboratory</p>
+            </div>
+            <div class="hidden md:block text-right">
+                <p class="data-label">Target Protein</p>
+                <p class="font-mono text-slate-700">Dipeptidyl Peptidase-4</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Left Column: Input Form -->
+            <div class="science-card p-6 lg:col-span-1 h-fit">
+                <h2 class="text-lg font-bold science-header">Analysis Setup</h2>
+                
+                <form id="dockForm" class="space-y-5">
+                    <div>
+                        <label class="block data-label mb-2">Receptor Model</label>
+                        <select id="protein" class="w-full bg-slate-50 border border-slate-300 rounded p-2.5 text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors">
+                            <option value="3G0B">3G0B (High Resolution)</option>
+                            <option value="5T4B">5T4B (Wild Type)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block data-label mb-2">Ligand Structure (SMILES)</label>
+                        <input type="text" id="smiles" value="CC(C)[C@H](N)C(=O)N1CCCC1" class="mono w-full bg-slate-50 border border-slate-300 rounded p-2.5 text-slate-800 text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors" placeholder="e.g. CCO">
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-primary w-full py-2.5 rounded font-semibold flex justify-center items-center shadow-sm">
+                        <span id="btnText">Run AutoDock Vina</span>
+                        <div id="btnLoader" class="loader ml-3 hidden"></div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Results & 3D Viewer -->
+            <div class="lg:col-span-3 space-y-6">
+                
+                <!-- ID & Properties Card -->
+                <div id="resultsCard" class="science-card p-6 hidden">
+                    <h3 class="text-lg font-bold science-header">Molecular Properties & Identity</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <p class="data-label">Compound Name</p>
+                            <p class="data-value truncate" id="r_name">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <p class="data-label">ChEMBL ID</p>
+                            <p class="data-value text-sky-600 font-mono" id="r_chembl">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <p class="data-label">Chemical Formula</p>
+                            <p class="data-value" id="r_formula">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <p class="data-label">Experimental IC50</p>
+                            <p class="data-value text-rose-600" id="r_ic50">-</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="data-label mb-3">Lipinski's Rule of Five Analysis</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="border-l-4 border-emerald-500 pl-3">
+                                <p class="text-xs text-slate-500 mb-1">Molecular Weight (MW)</p>
+                                <p class="font-mono font-semibold text-slate-800"><span id="r_mw">-</span> <span class="text-xs text-slate-400 font-normal">Da</span></p>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 pl-3">
+                                <p class="text-xs text-slate-500 mb-1">Partition Coefficient (LogP)</p>
+                                <p class="font-mono font-semibold text-slate-800" id="r_logp">-</p>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 pl-3">
+                                <p class="text-xs text-slate-500 mb-1">H-Bond Donors (HBD)</p>
+                                <p class="font-mono font-semibold text-slate-800" id="r_hbd">-</p>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 pl-3">
+                                <p class="text-xs text-slate-500 mb-1">H-Bond Acceptors (HBA)</p>
+                                <p class="font-mono font-semibold text-slate-800" id="r_hba">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Docking & 3D Viewer -->
+                <div id="dockingCard" class="science-card p-6 hidden">
+                    <div class="flex justify-between items-center science-header">
+                        <h3 class="text-lg font-bold">Molecular Interaction Analysis</h3>
+                        <div class="bg-sky-50 text-sky-800 px-4 py-1.5 rounded-full border border-sky-200 flex items-center">
+                            <span class="text-sm font-semibold mr-2">Binding Affinity (ΔG):</span>
+                            <span class="font-mono font-bold text-lg" id="r_affinity">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <div class="lg:col-span-3 bg-white border border-slate-300 rounded overflow-hidden relative" style="height: 450px;">
+                            <div id="viewer3d" class="w-full h-full relative"></div>
+                            <div class="absolute bottom-2 right-2 bg-white/90 px-2 py-1 text-xs text-slate-500 rounded border border-slate-200">
+                                Powered by Py3DMol
+                            </div>
+                        </div>
+                        
+                        <div class="lg:col-span-1">
+                            <h4 class="data-label mb-3">Conformational Poses</h4>
+                            <div class="overflow-y-auto max-h-[420px] pr-2 space-y-2" id="posesList">
+                                <!-- Poses injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error State -->
+                <div id="errorMsg" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded hidden text-sm font-medium"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('dockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const submitBtn = document.getElementById('submitBtn');
+            const resultsCard = document.getElementById('resultsCard');
+            const dockingCard = document.getElementById('dockingCard');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            // UI Loading state
+            btnText.innerText = 'Computing...';
+            btnLoader.classList.remove('hidden');
+            submitBtn.disabled = true;
+            resultsCard.classList.add('hidden');
+            dockingCard.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/dock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        smiles: document.getElementById('smiles').value,
+                        protein: document.getElementById('protein').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.error || 'Server processing error');
+                
+                // Populate Identity
+                document.getElementById('r_name').innerText = data.molecule.name;
+                document.getElementById('r_chembl').innerText = data.molecule.chembl_id;
+                document.getElementById('r_formula').innerText = data.molecule.formula;
+                document.getElementById('r_ic50').innerText = data.molecule.ic50;
+                document.getElementById('r_mw').innerText = data.molecule.mw;
+                document.getElementById('r_logp').innerText = data.molecule.logp;
+                document.getElementById('r_hbd').innerText = data.molecule.hbd;
+                document.getElementById('r_hba').innerText = data.molecule.hba;
+                
+                // Lipinski Violations Colors
+                const rules = [
+                    { id: 'r_mw', val: data.molecule.mw, limit: 500 },
+                    { id: 'r_logp', val: data.molecule.logp, limit: 5 },
+                    { id: 'r_hbd', val: data.molecule.hbd, limit: 5 },
+                    { id: 'r_hba', val: data.molecule.hba, limit: 10 }
+                ];
+                rules.forEach(r => {
+                    const el = document.getElementById(r.id).parentElement;
+                    if (r.val > r.limit) {
+                        el.classList.remove('border-emerald-500');
+                        el.classList.add('border-rose-500');
+                    } else {
+                        el.classList.add('border-emerald-500');
+                        el.classList.remove('border-rose-500');
+                    }
+                });
+                
+                // Populate Docking Results
+                if (data.docking.length > 0) {
+                    document.getElementById('r_affinity').innerText = data.docking[0].Affinity.toFixed(2) + ' kcal/mol';
+                    
+                    let posesHTML = '';
+                    data.docking.forEach((pose, i) => {
+                        let isTop = i === 0;
+                        let cardStyle = isTop ? 'bg-sky-50 border-sky-200' : 'bg-white border-slate-200';
+                        let valStyle = isTop ? 'text-sky-700' : 'text-slate-600';
+                        
+                        posesHTML += `
+                            <div class="border rounded p-3 ${cardStyle}">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-slate-500">MODE ${i+1}</span>
+                                    <span class="mono font-bold ${valStyle}">${pose.Affinity.toFixed(2)}</span>
+                                </div>
+                                <div class="flex justify-between text-xs text-slate-500">
+                                    <span>RMSD lb: ${pose.RMSD_lb}</span>
+                                    <span>ub: ${pose.RMSD_ub}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('posesList').innerHTML = posesHTML;
+                }
+                
+                resultsCard.classList.remove('hidden');
+                dockingCard.classList.remove('hidden');
+                
+                // Render 3D Viewer (Ultra-Premium Theme)
+                document.getElementById('viewer3d').innerHTML = ''; // Clear prev
+                let viewer = $3Dmol.createViewer('viewer3d', { backgroundColor: '#1e293b' }); // Dark slate background for contrast
+                
+                // Add Protein
+                viewer.addModel(data['3d'].receptor, 'pdb');
+                
+                // Add Ligand
+                viewer.addModel(data['3d'].ligand, 'pdbqt');
+                
+                // 1. Protein Style: Sleek Cartoon
+                viewer.setStyle({'model': 0}, {cartoon: {color: '#cbd5e1', style: 'oval', thickness: 0.2, opacity: 0.85}});
+                
+                // 2. Ligand Style: Ball and Stick (Neon Cyan)
+                viewer.setStyle({'model': 1}, {
+                    stick: {colorscheme: 'cyanCarbon', radius: 0.15},
+                    sphere: {colorscheme: 'cyanCarbon', radius: 0.4}
+                });
+                
+                // 3. Interacting Residues: Sticks colored by element
+                viewer.addStyle({'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}}, 
+                                {stick: {colorscheme: 'lightgreyCarbon', radius: 0.15}});
+                
+                // 4. Elegant Pocket Surface (Soft Blue Glow)
+                viewer.addSurface($3Dmol.SurfaceType.VDW, 
+                                  {opacity: 0.3, color: '#38bdf8'}, 
+                                  {'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}},
+                                  {'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}});
+                                  
+                // 5. Add Labels to Interacting Amino Acids!
+                let interactingAtoms = viewer.selectedAtoms({'model': 0, 'within': {'distance': 5.0, 'sel': {'model': 1}}});
+                let labeledResidues = new Set();
+                
+                interactingAtoms.forEach(function(a) {
+                    let resKey = a.resn + a.resi;
+                    // Only label C-alpha atoms to prevent clutter, or just the first atom encountered per residue
+                    if (!labeledResidues.has(resKey) && a.atom === 'CA') {
+                        labeledResidues.add(resKey);
+                        viewer.addLabel(resKey, {
+                            position: {x: a.x, y: a.y, z: a.z},
+                            backgroundColor: 'rgba(15, 23, 42, 0.7)',
+                            fontColor: '#38bdf8',
+                            fontSize: 12,
+                            backgroundOpacity: 0.8,
+                            borderThickness: 0.5,
+                            borderColor: '#38bdf8',
+                            showBackground: true
+                        });
+                    }
+                });
+                
+                // Zoom smoothly to ligand
+                viewer.zoomTo({'model': 1});
+                viewer.render();
+                
+            } catch (err) {
+                errorMsg.innerText = err.message;
+                errorMsg.classList.remove('hidden');
+            } finally {
+                btnText.innerText = 'Run AutoDock Vina';
+                btnLoader.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

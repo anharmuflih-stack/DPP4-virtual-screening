@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Mac
+.DS_Store
+
+# Temporary results (optional, uncomment to exclude specific results)
+# temp_*.pdbqt
+# flask_*.pdbqt
