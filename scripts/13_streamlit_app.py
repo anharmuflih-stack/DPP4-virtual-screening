@@ -6,6 +6,7 @@ import tempfile
 import urllib.request
 import urllib.parse
 import json
+import ssl
 import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Descriptors, AllChem
@@ -171,19 +172,24 @@ vina_exec = setup_vina()
 # ==========================================
 # 3. FUNGSI PENCARIAN CHEMBL & DOCKING
 # ==========================================
-def get_chembl_data(smiles):
+def get_chembl_data(mol):
     try:
-        encoded = urllib.parse.quote(smiles)
-        url = f"https://www.ebi.ac.uk/chembl/api/data/molecule.json?molecule_structures__canonical_smiles__flexmatch={encoded}"
+        inchikey = Chem.MolToInchiKey(mol)
+        url = f"https://www.ebi.ac.uk/chembl/api/data/molecule.json?molecule_structures__standard_inchi_key={inchikey}"
+        
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
         req = urllib.request.Request(url, headers={'Accept': 'application/json'})
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             data = json.loads(response.read().decode())
             if data.get('molecules') and len(data['molecules']) > 0:
-                mol = data['molecules'][0]
+                m = data['molecules'][0]
                 return {
-                    'id': mol.get('molecule_chembl_id', 'Tidak Ditemukan'),
-                    'name': mol.get('pref_name') or 'N/A',
-                    'phase': mol.get('max_phase') or '0'
+                    'id': m.get('molecule_chembl_id', 'Tidak Ditemukan'),
+                    'name': m.get('pref_name') or 'N/A',
+                    'phase': m.get('max_phase') or '0'
                 }
     except Exception:
         pass
@@ -204,7 +210,7 @@ def process_ligand(smiles):
     result = writer.write_string(setup_list[0])
     pdbqt_string = result[0] if isinstance(result, tuple) else result
     
-    chembl_data = get_chembl_data(smiles)
+    chembl_data = get_chembl_data(mol)
     props = {
         'MW': round(Descriptors.MolWt(mol), 2),
         'LogP': round(Descriptors.MolLogP(mol), 2),
