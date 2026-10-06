@@ -1,5 +1,5 @@
-Flask==3.0.0
-rdkit>=2023.3.1
-meeko>=0.5.0
-pandas>=2.0.0
-gunicorn>=21.2.0
+streamlit
+rdkit
+meeko
+pandas
+stmol
