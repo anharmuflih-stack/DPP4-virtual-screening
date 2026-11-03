@@ -1,10 +1,9 @@
-streamlit
+streamlit>=1.35.0
+altair>=5.0.0
 rdkit
 meeko
 pandas
-stmol
 scipy
 numpy
 gemmi
-ipython-genutils
-ipywidgets
+py3Dmol

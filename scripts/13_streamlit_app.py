@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import os
+import copy
 import math
 import platform
 import subprocess
@@ -11,11 +12,10 @@ import json
 import ssl
 import numpy as np
 import pandas as pd
+import altair as alt
 from rdkit import Chem
 from rdkit.Chem import Descriptors, AllChem
 from meeko import MoleculePreparation, PDBQTWriterLegacy
-from stmol import showmol
-import py3Dmol
 
 # Set konfigurasi halaman lebar penuh dengan tema cerah
 st.set_page_config(page_title="DPP-4 Virtual Screener", page_icon="🧬", layout="wide", initial_sidebar_state="collapsed")
@@ -532,6 +532,175 @@ def setup_vina():
     return vina_exec
 
 vina_exec = setup_vina()
+
+def _supports_stretch_width():
+    try:
+        parts = [int(x) for x in st.__version__.split(".")[:2] if x.isdigit()]
+        return tuple(parts) >= (1, 45)
+    except Exception:
+        return False
+
+_USE_STRETCH_WIDTH = _supports_stretch_width()
+
+def render_dataframe(df, **kwargs):
+    if _USE_STRETCH_WIDTH:
+        return st.dataframe(df, width="stretch", **kwargs)
+    return st.dataframe(df, use_container_width=True, **kwargs)
+
+def render_altair_chart(chart_obj, chart_key):
+    if _USE_STRETCH_WIDTH:
+        return st.altair_chart(chart_obj, width="stretch", theme=None, key=chart_key)
+    return st.altair_chart(chart_obj, use_container_width=True, theme=None, key=chart_key)
+
+def build_single_compound_comparison_chart(compound_name, aff_3g0b, aff_5t4b):
+    """Membangun Horizontal Bar Chart perbandingan 3G0B vs 5T4B untuk satu senyawa menggunakan Altair secara aman."""
+    rows = []
+    target_order = []
+    if aff_3g0b is not None and pd.notna(aff_3g0b) and np.isfinite(float(aff_3g0b)):
+        lbl_3g0b = "3G0B (Crystal Complex)"
+        target_order.append(lbl_3g0b)
+        rows.append({
+            "Target_Label": str(lbl_3g0b),
+            "Binding_Affinity": round(float(aff_3g0b), 3),
+            "PDB": "3G0B"
+        })
+    if aff_5t4b is not None and pd.notna(aff_5t4b) and np.isfinite(float(aff_5t4b)):
+        lbl_5t4b = "5T4B (Wild-Type DPP-4)"
+        target_order.append(lbl_5t4b)
+        rows.append({
+            "Target_Label": str(lbl_5t4b),
+            "Binding_Affinity": round(float(aff_5t4b), 3),
+            "PDB": "5T4B"
+        })
+    if not rows:
+        return None
+
+    df_chart = pd.DataFrame(copy.deepcopy(rows))
+    chart = (
+        alt.Chart(df_chart)
+        .mark_bar(cornerRadiusEnd=6, height=26)
+        .encode(
+            y=alt.Y(
+                "Target_Label:N",
+                sort=target_order,
+                title=None,
+                axis=alt.Axis(labelColor="#172B4D", labelFontWeight=600)
+            ),
+            x=alt.X(
+                "Binding_Affinity:Q",
+                title="Binding Affinity (kcal/mol)",
+                axis=alt.Axis(labelColor="#172B4D", titleColor="#71839A", gridColor="#E5F3FF")
+            ),
+            color=alt.Color(
+                "PDB:N",
+                scale=alt.Scale(domain=["3G0B", "5T4B"], range=["#2485C7", "#15966A"]),
+                legend=None
+            ),
+            tooltip=[
+                alt.Tooltip("Target_Label:N", title="Target PDB"),
+                alt.Tooltip("Binding_Affinity:Q", title="Binding Affinity (kcal/mol)", format=".3f")
+            ]
+        )
+        .properties(
+            height=165,
+            background="#FFFFFF",
+            title=alt.TitleParams(
+                text=f"Perbandingan Binding Affinity: {str(compound_name)} (kcal/mol)",
+                color="#172B4D",
+                font="Inter",
+                fontSize=12.5,
+                fontWeight=700,
+                anchor="start"
+            )
+        )
+        .configure_view(stroke="#DCE8F2")
+    )
+    return chart
+
+def build_top10_dual_target_chart(top10_df):
+    """Membangun Horizontal Grouped Bar Chart perbandingan 3G0B vs 5T4B (Top 10 Ranked) secara aman tanpa mutasi spec."""
+    if top10_df is None or top10_df.empty:
+        return None
+
+    df_src = top10_df.head(10).copy(deep=True)
+    melted_rows = []
+    compound_order = []
+
+    for _, r in df_src.iterrows():
+        cname = f"{str(r.get('compound_name', 'Unknown'))} ({str(r.get('molecule_chembl_id', '-'))})"
+        if cname not in compound_order:
+            compound_order.append(cname)
+
+        raw_diff = r.get("Affinity_Diff_kcal_mol")
+        diff_str = f"{float(raw_diff):.3f} kcal/mol" if (raw_diff is not None and pd.notna(raw_diff) and np.isfinite(float(raw_diff))) else "N/A"
+        stronger_str = str(r.get("Stronger_Target", "N/A")) if pd.notna(r.get("Stronger_Target")) else "N/A"
+
+        val_3g0b = r.get("Affinity_3G0B_kcal_mol")
+        if val_3g0b is not None and pd.notna(val_3g0b) and np.isfinite(float(val_3g0b)):
+            melted_rows.append({
+                "Compound": str(cname),
+                "Target": "3G0B",
+                "Binding_Affinity": round(float(val_3g0b), 3),
+                "Delta_Display": str(diff_str),
+                "Stronger_Target": str(stronger_str)
+            })
+
+        val_5t4b = r.get("Affinity_5T4B_kcal_mol")
+        if val_5t4b is not None and pd.notna(val_5t4b) and np.isfinite(float(val_5t4b)):
+            melted_rows.append({
+                "Compound": str(cname),
+                "Target": "5T4B",
+                "Binding_Affinity": round(float(val_5t4b), 3),
+                "Delta_Display": str(diff_str),
+                "Stronger_Target": str(stronger_str)
+            })
+
+    if not melted_rows:
+        return None
+
+    df_melted = pd.DataFrame(copy.deepcopy(melted_rows)).dropna(subset=["Compound", "Target", "Binding_Affinity"])
+    df_melted["Compound"] = df_melted["Compound"].astype(str)
+    df_melted["Target"] = df_melted["Target"].astype(str)
+    df_melted["Binding_Affinity"] = df_melted["Binding_Affinity"].astype(float)
+    df_melted["Delta_Display"] = df_melted["Delta_Display"].astype(str)
+    df_melted["Stronger_Target"] = df_melted["Stronger_Target"].astype(str)
+
+    chart = (
+        alt.Chart(df_melted)
+        .mark_bar(cornerRadiusEnd=4)
+        .encode(
+            y=alt.Y(
+                "Compound:N",
+                sort=compound_order,
+                title="Kandidat Senyawa Bahan Alam",
+                axis=alt.Axis(labelColor="#172B4D", titleColor="#71839A", labelLimit=210, labelFontWeight=600)
+            ),
+            yOffset=alt.YOffset("Target:N", sort=["3G0B", "5T4B"]),
+            x=alt.X(
+                "Binding_Affinity:Q",
+                title="Binding Affinity (kcal/mol) — Semakin Negatif Semakin Kuat",
+                axis=alt.Axis(labelColor="#172B4D", titleColor="#71839A", gridColor="#E5F3FF")
+            ),
+            color=alt.Color(
+                "Target:N",
+                scale=alt.Scale(domain=["3G0B", "5T4B"], range=["#2485C7", "#15966A"]),
+                legend=alt.Legend(title="Target Protein PDB", orient="top", labelColor="#172B4D", titleColor="#71839A")
+            ),
+            tooltip=[
+                alt.Tooltip("Compound:N", title="Compound"),
+                alt.Tooltip("Target:N", title="Target PDB"),
+                alt.Tooltip("Binding_Affinity:Q", title="Affinity (kcal/mol)", format=".3f"),
+                alt.Tooltip("Delta_Display:N", title="|ΔΔG| Diff"),
+                alt.Tooltip("Stronger_Target:N", title="More Negative Target")
+            ]
+        )
+        .properties(
+            height=340,
+            background="#FFFFFF"
+        )
+        .configure_view(stroke="#DCE8F2")
+    )
+    return chart
 
 # Load dataset terkurasi & hasil docking terpisah per PDB ID
 @st.cache_data
@@ -1154,148 +1323,179 @@ def render_interactive_3d_explorer(
   const focusResSeq = {json.dumps(focus_res_seq)};
 
   let spinning = false;
-  let viewer = $3Dmol.createViewer(document.getElementById("{viewer_id}"), {{
-    backgroundColor: "#13233F",
-    antialias: true,
-    cartoonQuality: 10
-  }});
+  let viewer = null;
 
-  viewer.addModel(pdbData, "pdb");
-  viewer.addModel(ligData, "pdbqt");
-
-  function applyScene() {{
-    viewer.removeAllShapes();
-    viewer.removeAllLabels();
-    viewer.removeAllSurfaces();
-    viewer.setStyle({{}}, {{}});
-
-    // 1. Protein Representation
-    if (showProtein) {{
-      if (repMode === "Cartoon" || repMode === "Cartoon + Ligand") {{
-        viewer.setStyle({{model: 0}}, {{cartoon: {{color: "#B8D4EE", style: "oval", thickness: 0.24, opacity: 0.92}}}});
-      }} else if (repMode === "Stick") {{
-        viewer.setStyle({{model: 0}}, {{stick: {{colorscheme: "lightGrayCarbon", radius: 0.12, opacity: 0.75}}}});
-      }} else if (repMode === "Ball and Stick") {{
-        viewer.setStyle({{model: 0}}, {{
-          stick: {{colorscheme: "lightGrayCarbon", radius: 0.12, opacity: 0.75}},
-          sphere: {{colorscheme: "lightGrayCarbon", scale: 0.2, opacity: 0.75}}
-        }});
-      }} else if (repMode === "Surface") {{
-        viewer.setStyle({{model: 0}}, {{cartoon: {{color: "#94B8D8", opacity: 0.5}}}});
-        viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.55, color: "#DCE8F2"}}, {{model: 0}}, {{model: 0}});
+  function initViewer() {{
+    try {{
+      if (typeof $3Dmol === "undefined") {{
+        return;
       }}
-    }}
-
-    // 2. Binding Pocket Highlighting (Actual Residues within 4.5 A of Ligand)
-    const pocketSel = {{model: 0, within: {{distance: 4.5, sel: {{model: 1}}}}}};
-    if (showPocket) {{
-      viewer.addStyle(pocketSel, {{
-        stick: {{colorscheme: "cyanCarbon", radius: 0.16}}
+      const container = document.getElementById("{viewer_id}");
+      if (!container) return;
+      viewer = $3Dmol.createViewer(container, {{
+        backgroundColor: "#13233F",
+        antialias: true,
+        cartoonQuality: 10
       }});
-      viewer.addSurface($3Dmol.SurfaceType.VDW, {{
-        opacity: 0.28,
-        color: "#38BDF8"
-      }}, pocketSel, pocketSel);
 
-      // Label interacting residues from coordinate analysis
-      const seenRes = new Set();
-      interactions.forEach(ix => {{
-        if (!seenRes.has(ix.res_seq)) {{
-          seenRes.add(ix.res_seq);
-          const isFocused = (focusResSeq !== null && ix.res_seq === focusResSeq);
-          viewer.addLabel(ix.res_label, {{
-            position: {{x: ix.rx, y: ix.ry, z: ix.rz}},
-            backgroundColor: isFocused ? "#15966A" : "rgba(23, 43, 77, 0.85)",
-            borderColor: isFocused ? "#DDF5E9" : "#2485C7",
-            borderThickness: 1,
-            fontColor: "#FFFFFF",
-            fontSize: isFocused ? 13 : 11,
-            showBackground: true
-          }});
-        }}
-      }});
+      viewer.addModel(pdbData, "pdb");
+      viewer.addModel(ligData, "pdbqt");
+      applyScene();
+    }} catch (err) {{
+      console.warn("3Dmol Viewer Initialization Notice:", err);
     }}
-
-    // 3. Ligand Representation (Prominent Emerald Green / Cyan Ball-and-Stick)
-    if (showLigand && repMode !== "Cartoon") {{
-      if (repMode === "Stick") {{
-        viewer.setStyle({{model: 1}}, {{stick: {{colorscheme: "greenCarbon", radius: 0.26}}}});
-      }} else {{
-        viewer.setStyle({{model: 1}}, {{
-          stick: {{colorscheme: "greenCarbon", radius: 0.24}},
-          sphere: {{colorscheme: "greenCarbon", scale: 0.32}}
-        }});
-      }}
-    }}
-
-    // 4. Coordinate-Validated Dashed Interaction Lines & Distance Labels (Å)
-    if (showInteractions) {{
-      interactions.forEach(ix => {{
-        viewer.addCylinder({{
-          start: {{x: ix.lx, y: ix.ly, z: ix.lz}},
-          end: {{x: ix.rx, y: ix.ry, z: ix.rz}},
-          radius: 0.065,
-          fromCap: 1,
-          toCap: 1,
-          dashed: true,
-          color: ix.color
-        }});
-        const mx = (ix.lx + ix.rx) / 2.0;
-        const my = (ix.ly + ix.ry) / 2.0;
-        const mz = (ix.lz + ix.rz) / 2.0;
-        viewer.addLabel(ix.dist + " Å", {{
-          position: {{x: mx, y: my, z: mz}},
-          backgroundColor: "rgba(15, 30, 54, 0.8)",
-          fontColor: "#DDF5E9",
-          fontSize: 10,
-          showBackground: true
-        }});
-      }});
-    }}
-
-    // Highlight focused residue if selected
-    if (focusResSeq !== null) {{
-      const focusSel = {{model: 0, resi: focusResSeq}};
-      viewer.addStyle(focusSel, {{
-        stick: {{colorscheme: "yellowCarbon", radius: 0.26}},
-        sphere: {{colorscheme: "yellowCarbon", scale: 0.28}}
-      }});
-      viewer.zoomTo({{or: [{{model: 1}}, focusSel]}});
-    }} else {{
-      viewer.zoomTo({{model: 1}});
-    }}
-
-    viewer.render();
   }}
 
-  applyScene();
+  function applyScene() {{
+    if (!viewer) return;
+    try {{
+      viewer.removeAllShapes();
+      viewer.removeAllLabels();
+      viewer.removeAllSurfaces();
+      viewer.setStyle({{}}, {{}});
+
+      // 1. Protein Representation
+      if (showProtein) {{
+        if (repMode === "Cartoon" || repMode === "Cartoon + Ligand") {{
+          viewer.setStyle({{model: 0}}, {{cartoon: {{color: "#B8D4EE", style: "oval", thickness: 0.24, opacity: 0.92}}}});
+        }} else if (repMode === "Stick") {{
+          viewer.setStyle({{model: 0}}, {{stick: {{colorscheme: "lightGrayCarbon", radius: 0.12, opacity: 0.75}}}});
+        }} else if (repMode === "Ball and Stick") {{
+          viewer.setStyle({{model: 0}}, {{
+            stick: {{colorscheme: "lightGrayCarbon", radius: 0.12, opacity: 0.75}},
+            sphere: {{colorscheme: "lightGrayCarbon", scale: 0.2, opacity: 0.75}}
+          }});
+        }} else if (repMode === "Surface") {{
+          viewer.setStyle({{model: 0}}, {{cartoon: {{color: "#94B8D8", opacity: 0.5}}}});
+          viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.55, color: "#DCE8F2"}}, {{model: 0}}, {{model: 0}});
+        }}
+      }}
+
+      // 2. Binding Pocket Highlighting (Actual Residues within 4.5 A of Ligand)
+      const pocketSel = {{model: 0, within: {{distance: 4.5, sel: {{model: 1}}}}}};
+      if (showPocket) {{
+        viewer.addStyle(pocketSel, {{
+          stick: {{colorscheme: "cyanCarbon", radius: 0.16}}
+        }});
+        viewer.addSurface($3Dmol.SurfaceType.VDW, {{
+          opacity: 0.28,
+          color: "#38BDF8"
+        }}, pocketSel, pocketSel);
+
+        // Label interacting residues from coordinate analysis
+        const seenRes = new Set();
+        interactions.forEach(ix => {{
+          if (!seenRes.has(ix.res_seq)) {{
+            seenRes.add(ix.res_seq);
+            const isFocused = (focusResSeq !== null && ix.res_seq === focusResSeq);
+            viewer.addLabel(ix.res_label, {{
+              position: {{x: ix.rx, y: ix.ry, z: ix.rz}},
+              backgroundColor: isFocused ? "#15966A" : "rgba(23, 43, 77, 0.85)",
+              borderColor: isFocused ? "#DDF5E9" : "#2485C7",
+              borderThickness: 1,
+              fontColor: "#FFFFFF",
+              fontSize: isFocused ? 13 : 11,
+              showBackground: true
+            }});
+          }}
+        }});
+      }}
+
+      // 3. Ligand Representation (Prominent Emerald Green / Cyan Ball-and-Stick)
+      if (showLigand && repMode !== "Cartoon") {{
+        if (repMode === "Stick") {{
+          viewer.setStyle({{model: 1}}, {{stick: {{colorscheme: "greenCarbon", radius: 0.26}}}});
+        }} else {{
+          viewer.setStyle({{model: 1}}, {{
+            stick: {{colorscheme: "greenCarbon", radius: 0.24}},
+            sphere: {{colorscheme: "greenCarbon", scale: 0.32}}
+          }});
+        }}
+      }}
+
+      // 4. Coordinate-Validated Dashed Interaction Lines & Distance Labels (Å)
+      if (showInteractions) {{
+        interactions.forEach(ix => {{
+          viewer.addCylinder({{
+            start: {{x: ix.lx, y: ix.ly, z: ix.lz}},
+            end: {{x: ix.rx, y: ix.ry, z: ix.rz}},
+            radius: 0.065,
+            fromCap: 1,
+            toCap: 1,
+            dashed: true,
+            color: ix.color
+          }});
+          const mx = (ix.lx + ix.rx) / 2.0;
+          const my = (ix.ly + ix.ry) / 2.0;
+          const mz = (ix.lz + ix.rz) / 2.0;
+          viewer.addLabel(ix.dist + " Å", {{
+            position: {{x: mx, y: my, z: mz}},
+            backgroundColor: "rgba(15, 30, 54, 0.8)",
+            fontColor: "#DDF5E9",
+            fontSize: 10,
+            showBackground: true
+          }});
+        }});
+      }}
+
+      // Highlight focused residue if selected
+      if (focusResSeq !== null) {{
+        const focusSel = {{model: 0, resi: focusResSeq}};
+        viewer.addStyle(focusSel, {{
+          stick: {{colorscheme: "yellowCarbon", radius: 0.26}},
+          sphere: {{colorscheme: "yellowCarbon", scale: 0.28}}
+        }});
+        viewer.zoomTo({{or: [{{model: 1}}, focusSel]}});
+      }} else {{
+        viewer.zoomTo({{model: 1}});
+      }}
+
+      viewer.render();
+    }} catch (err) {{
+      console.warn("3Dmol Scene Render Notice:", err);
+    }}
+  }}
+
+  initViewer();
 
   function resetCam() {{
+    if (!viewer) return;
     viewer.zoomTo({{model: 1}});
     viewer.render();
   }}
   function zoomLigand() {{
+    if (!viewer) return;
     viewer.zoomTo({{model: 1}}, 500);
     viewer.render();
   }}
   function zoomStep(factor) {{
+    if (!viewer) return;
     viewer.zoom(factor);
     viewer.render();
   }}
   function toggleSpin() {{
+    if (!viewer) return;
     spinning = !spinning;
     viewer.spin(spinning ? "y" : false);
     const btn = document.getElementById("spinBtn_{viewer_id}");
-    if (spinning) btn.classList.add("active");
-    else btn.classList.remove("active");
+    if (btn) {{
+      if (spinning) btn.classList.add("active");
+      else btn.classList.remove("active");
+    }}
   }}
   function toggleFull() {{
-    const el = document.getElementById("wrap_{viewer_id}");
-    if (!document.fullscreenElement) {{
-      if (el.requestFullscreen) el.requestFullscreen();
-    }} else {{
-      if (document.exitFullscreen) document.exitFullscreen();
-    }}
+    try {{
+      const el = document.getElementById("wrap_{viewer_id}");
+      if (!el) return;
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fsEl) {{
+        if (el.requestFullscreen) el.requestFullscreen().catch(() => {{}});
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      }} else {{
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {{}});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }}
+    }} catch (err) {{}}
   }}
 </script>
 </body>
@@ -1560,64 +1760,24 @@ Setiap ligan ditambatkan secara independen terhadap kedua struktur reseptor DPP-
         # Horizontal Bar Chart Comparison + Poses Tables for 3G0B and 5T4B
         comp_col1, comp_col2 = st.columns([1.15, 1.35], gap="medium")
         with comp_col1:
-            if aff_3g0b is not None or aff_5t4b is not None:
-                chart_rows = []
-                if aff_3g0b is not None:
-                    chart_rows.append({'Target PDB': '3G0B (Crystal Complex)', 'Affinity (kcal/mol)': aff_3g0b, 'PDB': '3G0B'})
-                if aff_5t4b is not None:
-                    chart_rows.append({'Target PDB': '5T4B (Wild-Type DPP-4)', 'Affinity (kcal/mol)': aff_5t4b, 'PDB': '5T4B'})
-                df_comp_chart = pd.DataFrame(chart_rows)
-                st.vega_lite_chart(
-                    df_comp_chart,
-                    {
-                        "background": "#FFFFFF",
-                        "padding": 12,
-                        "height": 165,
-                        "title": {
-                            "text": f"Perbandingan Binding Affinity: {props['Name']} (kcal/mol)",
-                            "color": "#172B4D",
-                            "font": "Inter",
-                            "fontSize": 12.5,
-                            "fontWeight": 700,
-                            "anchor": "start"
-                        },
-                        "mark": {"type": "bar", "cornerRadiusEnd": 6, "height": 26, "tooltip": True},
-                        "encoding": {
-                            "y": {
-                                "field": "Target PDB",
-                                "type": "nominal",
-                                "title": None,
-                                "axis": {"labelColor": "#172B4D", "labelFontWeight": 600}
-                            },
-                            "x": {
-                                "field": "Affinity (kcal/mol)",
-                                "type": "quantitative",
-                                "title": "Binding Affinity (kcal/mol)",
-                                "axis": {"labelColor": "#172B4D", "titleColor": "#71839A", "gridColor": "#E5F3FF"}
-                            },
-                            "color": {
-                                "field": "PDB",
-                                "type": "nominal",
-                                "scale": {"domain": ["3G0B", "5T4B"], "range": ["#2485C7", "#15966A"]},
-                                "legend": None
-                            }
-                        },
-                        "config": {"view": {"stroke": "#DCE8F2"}}
-                    },
-                    use_container_width=True
+            single_chart = build_single_compound_comparison_chart(props.get('Name', 'Compound'), aff_3g0b, aff_5t4b)
+            if single_chart is not None:
+                render_altair_chart(
+                    single_chart,
+                    chart_key=f"single_comp_chart_{props.get('ChEMBL_ID', 'custom')}_{aff_3g0b}_{aff_5t4b}"
                 )
         with comp_col2:
             pose_tab_3g0b, pose_tab_5t4b = st.tabs(["📊 Poses 3G0B", "📊 Poses 5T4B"])
             with pose_tab_3g0b:
                 if dual_res['3G0B']['poses']:
-                    df_p3 = pd.DataFrame(dual_res['3G0B']['poses'])
-                    st.dataframe(df_p3.style.highlight_min(subset=['Affinity (kcal/mol)'], color='#DDF5E9'), use_container_width=True, hide_index=True, height=140)
+                    df_p3 = pd.DataFrame(copy.deepcopy(dual_res['3G0B']['poses']))
+                    render_dataframe(df_p3, hide_index=True, height=140)
                 else:
                     st.warning("Pose 3G0B tidak tersedia.")
             with pose_tab_5t4b:
                 if dual_res['5T4B']['poses']:
-                    df_p5 = pd.DataFrame(dual_res['5T4B']['poses'])
-                    st.dataframe(df_p5.style.highlight_min(subset=['Affinity (kcal/mol)'], color='#DDF5E9'), use_container_width=True, hide_index=True, height=140)
+                    df_p5 = pd.DataFrame(copy.deepcopy(dual_res['5T4B']['poses']))
+                    render_dataframe(df_p5, hide_index=True, height=140)
                 else:
                     st.warning("Pose 5T4B tidak tersedia.")
 
@@ -1809,7 +1969,7 @@ Setiap ligan ditambatkan secara independen terhadap kedua struktur reseptor DPP-
 </div>
 """, unsafe_allow_html=True)
         if not df_ix_active.empty:
-            st.dataframe(df_ix_active, use_container_width=True, hide_index=True)
+            render_dataframe(df_ix_active.copy(), hide_index=True)
         else:
             st.info("Tidak ada residu dalam jarak cutoff interaksi (≤4.5 Å) untuk pose ini.")
 
@@ -1984,67 +2144,11 @@ with tab_explorer:
 </div>
 """, unsafe_allow_html=True)
 
-            top10_comp = valid_ranked_df.head(10).copy()
-            melted_rows = []
-            for _, r in top10_comp.iterrows():
-                cname = f"{r['compound_name']} ({r['molecule_chembl_id']})"
-                if pd.notna(r.get('Affinity_3G0B_kcal_mol')):
-                    melted_rows.append({
-                        'Compound': cname,
-                        'Target': '3G0B',
-                        'Binding Affinity (kcal/mol)': float(r['Affinity_3G0B_kcal_mol']),
-                        'Diff (kcal/mol)': r.get('Affinity_Diff_kcal_mol'),
-                        'Stronger Target': r.get('Stronger_Target')
-                    })
-                if pd.notna(r.get('Affinity_5T4B_kcal_mol')):
-                    melted_rows.append({
-                        'Compound': cname,
-                        'Target': '5T4B',
-                        'Binding Affinity (kcal/mol)': float(r['Affinity_5T4B_kcal_mol']),
-                        'Diff (kcal/mol)': r.get('Affinity_Diff_kcal_mol'),
-                        'Stronger Target': r.get('Stronger_Target')
-                    })
-            if melted_rows:
-                df_melted = pd.DataFrame(melted_rows)
-                st.vega_lite_chart(
-                    df_melted,
-                    {
-                        "background": "#FFFFFF",
-                        "padding": 16,
-                        "height": 340,
-                        "mark": {"type": "bar", "cornerRadiusEnd": 4, "tooltip": True},
-                        "encoding": {
-                            "y": {
-                                "field": "Compound",
-                                "type": "nominal",
-                                "sort": None,
-                                "title": "Kandidat Senyawa Bahan Alam",
-                                "axis": {"labelColor": "#172B4D", "titleColor": "#71839A", "labelLimit": 210, "labelFontWeight": 600}
-                            },
-                            "yOffset": {"field": "Target"},
-                            "x": {
-                                "field": "Binding Affinity (kcal/mol)",
-                                "type": "quantitative",
-                                "title": "Binding Affinity (kcal/mol) — Semakin Negatif Semakin Kuat",
-                                "axis": {"labelColor": "#172B4D", "titleColor": "#71839A", "gridColor": "#E5F3FF"}
-                            },
-                            "color": {
-                                "field": "Target",
-                                "type": "nominal",
-                                "scale": {"domain": ["3G0B", "5T4B"], "range": ["#2485C7", "#15966A"]},
-                                "legend": {"title": "Target Protein PDB", "orient": "top", "labelColor": "#172B4D", "titleColor": "#71839A"}
-                            },
-                            "tooltip": [
-                                {"field": "Compound", "type": "nominal", "title": "Compound"},
-                                {"field": "Target", "type": "nominal", "title": "Target PDB"},
-                                {"field": "Binding Affinity (kcal/mol)", "type": "quantitative", "title": "Affinity (kcal/mol)"},
-                                {"field": "Diff (kcal/mol)", "type": "quantitative", "title": "|ΔΔG| Diff (kcal/mol)"},
-                                {"field": "Stronger Target", "type": "nominal", "title": "More Negative Target"}
-                            ]
-                        },
-                        "config": {"view": {"stroke": "#DCE8F2"}}
-                    },
-                    use_container_width=True
+            top10_chart = build_top10_dual_target_chart(valid_ranked_df)
+            if top10_chart is not None:
+                render_altair_chart(
+                    top10_chart,
+                    chart_key=f"top10_dual_target_chart_{ranking_mode}_{split_filter}_{lip_filter}_{len(valid_ranked_df)}"
                 )
 
         # Display Data Table inside consistent card header (Ranked Valid + Clear Status for Unranked/Failed)
@@ -2059,10 +2163,10 @@ with tab_explorer:
 
         # Order table: valid ranked rows first (with Rank column), followed by unranked/failed rows clearly flagged
         valid_ranked_copy = valid_ranked_df.copy()
-        valid_ranked_copy.insert(0, 'Rank', range(1, len(valid_ranked_copy) + 1))
+        valid_ranked_copy.insert(0, 'Rank', [f"#{idx}" for idx in range(1, len(valid_ranked_copy) + 1)])
         unranked_df = filtered_df.drop(index=valid_ranked_df.index).copy()
         if not unranked_df.empty:
-            unranked_df.insert(0, 'Rank', None)
+            unranked_df.insert(0, 'Rank', "-")
         combined_display_df = pd.concat([valid_ranked_copy, unranked_df], ignore_index=True)
 
         display_cols = [
@@ -2073,7 +2177,7 @@ with tab_explorer:
                 'MW', 'LogP', 'HBD', 'HBA', 'Lipinski_Pass', 'Docking_Status', 'dataset_split'
             ] if c in combined_display_df.columns
         ]
-        st.dataframe(combined_display_df[display_cols], use_container_width=True, hide_index=True)
+        render_dataframe(combined_display_df[display_cols].copy(), hide_index=True)
 
         dl_c1, dl_c2, dl_c3 = st.columns(3)
         with dl_c1:
@@ -2187,11 +2291,11 @@ Nol Missing Values (0)<br>
         split_view = st.radio("Pilih Informasi Dataset yang Ditampilkan:", ["Test Set (Validation & Benchmark)", "Analysis Set (Screening Candidates)", "Master Dataset (Semua)"], horizontal=True)
         
         if split_view == "Test Set (Validation & Benchmark)" and df_test is not None:
-            st.dataframe(df_test[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'pIC50', 'compound_source']], use_container_width=True, hide_index=True)
+            render_dataframe(df_test[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'pIC50', 'compound_source']].copy(), hide_index=True)
         elif split_view == "Analysis Set (Screening Candidates)" and df_analysis is not None:
-            st.dataframe(df_analysis[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'Lipinski_Pass', 'compound_source']], use_container_width=True, hide_index=True)
+            render_dataframe(df_analysis[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'Lipinski_Pass', 'compound_source']].copy(), hide_index=True)
         else:
-            st.dataframe(df_master[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'dataset_split']], use_container_width=True, hide_index=True)
+            render_dataframe(df_master[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'dataset_split']].copy(), hide_index=True)
             
         # Section 3: Predictive Validity Correlation
         if summary_metrics and 'correlation_metrics' in summary_metrics:
