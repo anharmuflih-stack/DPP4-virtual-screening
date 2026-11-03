@@ -1,0 +1,115 @@
+molecule_chembl_id,compound_name,canonical_smiles,formula,MW,LogP,HBD,HBA,TPSA,RotB,HeavyAtoms,Lipinski_Pass,Veber_Pass,Vina_Compatible,pIC50,dataset_split,Affinity_3G0B_kcal_mol,Docking_Status,Target_PDB
+CHEMBL383705,CHEMBL383705,CC(C)[C@H](N)C(=O)N1CCCC1,C9H18N2O,170.26,0.59,1,2,46.33,2,12,True,True,True,5.4,Test Set (Validation & Benchmark),-5.883,Success,3G0B
+CHEMBL142703,VILDAGLIPTIN,N#C[C@@H]1CCCN1C(=O)CNC12CC3CC(CC(O)(C3)C1)C2,C17H25N3O2,303.41,1.17,2,4,76.36,3,22,True,True,True,7.47,Test Set (Validation & Benchmark),-8.025,Success,3G0B
+CHEMBL29292,UBENIMEX,CC(C)C[C@H](NC(=O)[C@@H](O)[C@H](N)Cc1ccccc1)C(=O)O,C16H24N2O4,308.38,0.53,4,4,112.65,8,22,True,True,True,7.0,Test Set (Validation & Benchmark),-7.85,Success,3G0B
+CHEMBL34062,CHEMBL34062,COc1cc(OC)cc(-c2nc(N)c(CN)c(-c3ccc(Cl)cc3Cl)n2)c1,C19H18Cl2N4O2,405.29,4.18,2,6,96.28,5,27,True,True,True,10.0,Test Set (Validation & Benchmark),-8.001,Success,3G0B
+CHEMBL382127,CHEMBL382127,NCC1(c2ccccc2)CCCC1,C12H17N,175.27,2.46,1,1,26.02,2,13,True,True,True,4.4,Test Set (Validation & Benchmark),-7.084,Success,3G0B
+CHEMBL374936,CHEMBL374936,C[C@H](c1nc(-c2ccc(S(C)(=O)=O)cc2)no1)[C@H](N)C(=O)N1CCCC1,C17H22N4O4S,378.45,1.19,1,7,119.39,5,26,True,True,True,6.91,Test Set (Validation & Benchmark),-9.405,Success,3G0B
+CHEMBL231994,CHEMBL231994,COc1ccc(N2CCC(N)C(c3cccc(C)c3)C2)cc1OC,C20H26N2O2,326.44,3.33,1,4,47.72,4,24,True,True,True,6.22,Test Set (Validation & Benchmark),-8.34,Success,3G0B
+CHEMBL254229,COCHINCHINENENE A,COc1ccc(C(CCc2ccc(O)cc2OC)c2c(OC)cc(/C=C/c3ccc(O)cc3)cc2OC)cc1,C33H34O6,526.63,7.07,2,6,77.38,11,39,False,False,True,4.43,Test Set (Validation & Benchmark),-8.13,Success,3G0B
+CHEMBL295124,BERBERINE,COc1ccc2cc3[n+](cc2c1OC)CCc1cc2c(cc1-3)OCO2,C20H18NO4+,336.37,3.1,0,4,40.8,2,25,True,True,True,,Test Set (Validation & Benchmark),-8.46,Success,3G0B
+CHEMBL140,CURCUMIN,COc1cc(/C=C/C(=O)CC(=O)/C=C/c2ccc(O)c(OC)c2)ccc1O,C21H20O6,368.39,3.37,2,6,93.06,8,27,True,True,True,,Test Set (Validation & Benchmark),-8.317,Success,3G0B
+CHEMBL8996,ERIODICTYOL,O=C1C[C@@H](c2ccc(O)c(O)c2)Oc2cc(O)cc(O)c21,C15H12O6,288.26,2.22,4,6,107.22,1,21,True,True,True,,Test Set (Validation & Benchmark),-8.033,Success,3G0B
+CHEMBL127,BAICALEIN,C[C@@H](O)[C@H]1C(=O)N2C(C(=O)O)=C(S[C@@H]3CN[C@H](C(=O)N(C)C)C3)[C@H](C)[C@H]12,C17H25N3O5S,383.47,-0.31,3,6,110.18,5,26,True,True,True,,Test Set (Validation & Benchmark),-7.267,Success,3G0B
+CHEMBL266567,EPICATECHIN,CCCCS(=O)(=O)C[C@@H](NC(=O)c1cccnc1)C(=O)N[C@@H](Cc1cc(F)cc(F)c1)[C@H](O)CNCc1cccc(CC)c1,C32H40F2N4O5S,630.76,3.11,4,7,137.49,17,44,True,False,True,,Test Set (Validation & Benchmark),,Docking Failed,3G0B
+CHEMBL269229,ROSMARINIC ACID,CC12CCC(=O)C=C1[C@@H]1C[C@@H]1C1C2CCC2(C)C1CCC21CCC(=O)O1,C23H30O3,354.49,4.45,0,3,43.37,0,26,True,True,True,,Test Set (Validation & Benchmark),-8.734,Success,3G0B
+CHEMBL33036,PIPERINE,C=CCCC(COCCCCCCCCCCCCCCCCCC)NC(C)=O,C26H51NO2,409.7,7.74,1,2,38.33,23,29,True,False,True,,Test Set (Validation & Benchmark),,Docking Failed,3G0B
+CHEMBL1323,CAPSAICIN,CC(C)CN(C[C@@H](O)[C@H](Cc1ccccc1)NC(=O)O[C@H]1CO[C@H]2OCC[C@H]21)S(=O)(=O)c1ccc(N)cc1,C27H37N3O7S,547.67,2.38,3,8,140.42,11,38,True,False,True,,Test Set (Validation & Benchmark),-8.922,Success,3G0B
+CHEMBL149,CHRYSIN,Oc1ccc2c3c1O[C@H]1c4[nH]c5ccccc5c4C[C@@]4(O)C(C2)N(CC2CC2)CC[C@]314,C26H26N2O3,414.51,3.57,3,4,68.72,2,31,True,True,True,,Test Set (Validation & Benchmark),-8.96,Success,3G0B
+CHEMBL21734,FISETIN,O=[N+]([O-])c1cc(Cl)c(N=C2NCCN2)c(Cl)c1,C9H8Cl2N4O2,275.1,2.08,2,3,79.56,2,17,True,True,True,,Test Set (Validation & Benchmark),-5.926,Success,3G0B
+CHEMBL48,DAIDZEIN,CC(=O)O[C@H]1C(=O)[C@@]2(C)C([C@H](OC(=O)c3ccccc3)[C@]3(O)C[C@H](OC(=O)[C@H](O)[C@@H](NC(=O)c4ccccc4)c4ccccc4)C(C)=C1C3(C)C)[C@]1(OC(C)=O)CO[C@@H]1C[C@@H]2O,C47H51NO14,853.92,3.74,4,14,221.29,10,62,False,False,True,,Test Set (Validation & Benchmark),,Docking Failed,3G0B
+CHEMBL453856,SILIBININ,CC(C)=CC[C@H](OC(=O)C(C)C)C1=CC(=O)c2c(O)ccc(O)c2C1=O,C20H22O6,358.39,3.33,2,6,100.9,5,26,True,True,True,,Test Set (Validation & Benchmark),-8.081,Success,3G0B
+CHEMBL67279,TALABOSTAT,CC(C)[C@H](N)C(=O)N1CCC[C@H]1B(O)O,C9H19BN2O3,214.07,-1.03,3,4,86.79,3,15,True,True,False,8.7,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL305170,CHEMBL305170,CC(C)[C@@H](N)C(=O)N1CCC[C@H]1B(O)O,C9H19BN2O3,214.07,-1.03,3,4,86.79,3,15,True,True,False,3.94,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL65406,CHEMBL65406,CC(C)[C@@H](N)C(=O)N1CCC[C@@H]1B(O)O,C9H19BN2O3,214.07,-1.03,3,4,86.79,3,15,True,True,False,5.4,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL63895,CHEMBL63895,O=C([C@@H]1CCCN1)N1CCC[C@H]1B(O)O,C9H17BN2O3,212.06,-1.26,3,4,72.8,2,15,True,True,False,7.7,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL3084811,CHEMBL3084811,N#C[C@@H]1CCCN1C(=O)CN[C@]12C[C@@H]3C[C@@H](C[C@@](O)(C3)C1)C2,C17H25N3O2,303.41,1.17,2,4,76.36,3,22,True,True,True,8.46,Analysis Set (Screening Candidates),,Failed 3D Conformer,3G0B
+CHEMBL308333,ACTINONIN,CCCCC[C@H](CC(=O)NO)C(=O)N[C@H](C(=O)N1CCC[C@H]1CO)C(C)C,C19H35N3O5,385.51,1.2,4,5,118.97,11,27,True,False,True,7.0,Analysis Set (Screening Candidates),-7.19,Success,3G0B
+CHEMBL385517,SAXAGLIPTIN ANHYDROUS,N#C[C@@H]1C[C@@H]2C[C@@H]2N1C(=O)[C@@H](N)C12CC3CC(CC(O)(C3)C1)C2,C18H25N3O2,315.42,1.16,2,4,90.35,2,23,True,True,True,9.22,Analysis Set (Screening Candidates),-8.221,Success,3G0B
+CHEMBL195189,CHEMBL195189,CC(C)[C@H](N)C(=O)N1CCC[C@@H]1B(O)O,C9H19BN2O3,214.07,-1.03,3,4,86.79,3,15,True,True,False,9.52,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL1161916,CHEMBL1161916,Cn1c(=O)c2c(nc(N3CCCC(N)C3)n2Cc2ccccc2C#N)n(C)c1=O,C20H23N7O2,393.45,0.28,1,6,114.87,3,29,True,True,True,8.7,Analysis Set (Screening Candidates),-8.229,Success,3G0B
+CHEMBL227954,CHEMBL227954,N#Cc1ccccc1Cn1c(N2CCC[C@@H](N)C2)nc2ccccc2c1=O,C21H21N5O,359.43,2.24,1,5,87.94,3,27,True,True,True,7.89,Analysis Set (Screening Candidates),-9.67,Success,3G0B
+CHEMBL235134,CHEMBL235134,Cn1c(=O)c2c(nc(N3CCNCC3)n2Cc2ccccc2)n(C)c1=O,C18H22N6O2,354.41,-0.11,1,5,77.09,3,26,True,True,True,5.55,Analysis Set (Screening Candidates),-8.275,Success,3G0B
+CHEMBL251977,CHEMBL251977,COc1cc(O)c(C(CCc2ccc(O)cc2OC)c2ccc(O)cc2)cc1CCC(=O)c1ccc(O)cc1,C32H32O7,528.6,6.11,4,7,116.45,11,39,False,False,True,4.43,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL254649,COCHINCHINENIN C,COc1ccc(C(CCc2ccc(O)cc2OC)c2cc(CCC(=O)c3ccc(O)cc3)c(OC)cc2O)cc1,C33H34O7,542.63,6.41,3,7,105.45,12,40,False,False,True,4.43,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL254648,COCHINCHINENIN B,COc1cc(OC)c(C(CCc2ccc(O)cc2OC)c2ccc(O)cc2)cc1CCC(=O)c1ccc(O)cc1,C33H34O7,542.63,6.41,3,7,105.45,12,40,False,False,True,4.43,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL254647,CHEMBL254647,COc1cc(O)ccc1CCC(c1ccc(O)cc1)c1cc2c(c(C)c1O)O[C@@H](c1ccc(O)cc1)CC2,C32H32O6,512.6,6.66,4,6,99.38,7,38,False,True,True,4.41,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL254440,COCHINCHINENENE D,COc1cc(O)ccc1CCC(c1ccc(O)cc1)c1c(O)cc(O)cc1/C=C/c1ccc(O)cc1,C30H28O6,484.55,6.16,5,6,110.38,8,36,True,True,True,4.38,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL254439,COCHINCHINENENE C,COc1cc(O)ccc1CCC(c1ccc(O)cc1)c1c(/C=C/c2ccc(O)cc2)cc(O)cc1OC,C31H30O6,498.58,6.46,4,6,99.38,9,37,True,True,True,4.4,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL399481,COCHINCHINENENE B,COc1ccc(C(CCc2ccc(O)cc2OC)c2c(O)cc(OC)cc2/C=C/c2ccc(O)cc2)cc1,C32H32O6,512.6,6.76,3,6,88.38,10,38,False,True,True,4.41,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL1431,METFORMIN,CN(C)C(=N)NC(=N)N,C4H11N5,129.17,-1.03,4,2,88.99,0,9,True,True,True,4.54,Analysis Set (Screening Candidates),-5.138,Success,3G0B
+CHEMBL257036,CHEMBL257036,NCc1ccccc1-c1ccccc1,C13H13N,183.25,2.81,1,1,26.02,2,14,True,True,True,4.52,Analysis Set (Screening Candidates),-7.566,Success,3G0B
+CHEMBL272114,CHEMBL272114,Cn1cnc2cc(C#N)c(-c3ccccc3Cl)c(CN)c21,C16H13ClN4,296.76,3.22,1,3,67.63,2,21,True,True,True,8.1,Analysis Set (Screening Candidates),-7.85,Success,3G0B
+CHEMBL504823,CHEMBL504823,N[C@H]1CCCN([P@@](N)(=O)NS(=O)(=O)O)C1=O,C5H13N4O5PS,272.22,-1.6,4,5,155.82,3,16,True,False,True,7.68,Analysis Set (Screening Candidates),-6.06,Success,3G0B
+CHEMBL8260,BAICALEIN,O=c1cc(-c2ccccc2)oc2cc(O)c(O)c(O)c12,C15H10O5,270.24,2.58,3,5,90.9,1,20,True,True,True,3.7,Analysis Set (Screening Candidates),-8.185,Success,3G0B
+CHEMBL210276,"3,7-DIHYDROXYFLAVONE",O=c1c(O)c(-c2ccccc2)oc2cc(O)ccc12,C15H10O4,254.24,2.87,2,4,70.67,1,19,True,True,True,3.7,Analysis Set (Screening Candidates),-8.152,Success,3G0B
+CHEMBL50,QUERCETIN,O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12,C15H10O7,302.24,1.99,5,7,131.36,1,22,True,True,True,3.89,Analysis Set (Screening Candidates),-7.805,Success,3G0B
+CHEMBL150,KAEMPFEROL,O=c1c(O)c(-c2ccc(O)cc2)oc2cc(O)cc(O)c12,C15H10O6,286.24,2.28,4,6,111.13,1,21,True,True,True,3.88,Analysis Set (Screening Candidates),-7.843,Success,3G0B
+CHEMBL226335,RUTIN,C[C@@H]1O[C@@H](OC[C@H]2O[C@@H](Oc3c(-c4ccc(O)c(O)c4)oc4cc(O)cc(O)c4c3=O)[C@H](O)[C@@H](O)[C@@H]2O)[C@H](O)[C@H](O)[C@H]1O,C27H30O16,610.52,-1.69,10,16,269.43,6,43,False,False,True,3.84,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL485818,BAICALIN,O=C(O)[C@H]1O[C@@H](Oc2cc3oc(-c4ccccc4)cc(=O)c3c(O)c2O)[C@H](O)[C@@H](O)[C@@H]1O,C21H18O11,446.36,0.14,6,10,187.12,4,32,True,False,True,3.65,Analysis Set (Screening Candidates),-9.352,Success,3G0B
+CHEMBL564249,CHEMBL564249,CS(=O)(=O)c1cccc(C(=O)NC[C@@H]2CCCN2C(=O)C[C@H](N)Cc2cccc(Cl)c2)c1,C23H28ClN3O4S,478.01,2.42,2,5,109.57,8,32,True,True,True,9.42,Analysis Set (Screening Candidates),-8.943,Success,3G0B
+CHEMBL376359,ALOGLIPTIN,Cn1c(=O)cc(N2CCC[C@@H](N)C2)n(Cc2ccccc2C#N)c1=O,C18H21N5O2,339.4,0.39,1,5,97.05,3,25,True,True,True,8.0,Analysis Set (Screening Candidates),-7.719,Success,3G0B
+CHEMBL1090,VIDARABINE,Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@@H]1O,C10H13N5O4,267.25,-1.98,4,8,139.54,2,19,True,True,True,7.21,Analysis Set (Screening Candidates),-6.725,Success,3G0B
+CHEMBL567893,GRASSYSTATIN A,COC(=O)[C@@H]1CCCN1C(=O)[C@@H](Cc1ccccc1)N(C)C(=O)[C@H](C)NC(=O)[C@@H](NC(=O)C[C@H](O)[C@H](CC(C)C)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CC(C)C)NC(=O)[C@H](OC(=O)[C@@H](OC(=O)[C@H](C(C)C)N(C)C)C(C)C)C(C)C)[C@@H](C)O,C58H95N9O16,1174.44,0.49,8,17,351.81,33,83,False,False,True,5.0,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL214381,DIPROTIN A,CC[C@H](C)[C@H](N)C(=O)N1CCC[C@H]1C(=O)N[C@H](C(=O)O)[C@@H](C)CC,C17H31N3O4,341.45,0.97,3,4,112.73,8,24,True,True,True,5.52,Analysis Set (Screening Candidates),-7.366,Success,3G0B
+CHEMBL1761683,CHEMBL1761683,CC(=O)O[C@H]1CC[C@@]2(C)C(=CC[C@@H]3[C@@H]2CC[C@]2(C)C(C(C)=O)=CC[C@@H]32)C1,C23H32O3,356.51,5.01,0,3,43.37,2,26,True,True,True,4.45,Analysis Set (Screening Candidates),-8.603,Success,3G0B
+CHEMBL2147775,CHEMBL2147775,Cc1cc(N2CCN([C@H]3CN[C@H](C(=O)N4CCSC4)C3)CC2)n(-c2ccccc2)n1,C22H30N6OS,426.59,1.57,1,6,56.64,4,30,True,True,True,8.2,Analysis Set (Screening Candidates),-8.096,Success,3G0B
+CHEMBL2147776,CHEMBL2147776,Cc1cc(N2CCN([C@H]3CN[C@@H](C(=O)N4CCSC4)C3)CC2)n(-c2ccccc2)n1,C22H30N6OS,426.59,1.57,1,6,56.64,4,30,True,True,True,6.0,Analysis Set (Screening Candidates),-8.34,Success,3G0B
+CHEMBL2147777,TENELIGLIPTIN,Cc1cc(N2CCN([C@@H]3CN[C@H](C(=O)N4CCSC4)C3)CC2)n(-c2ccccc2)n1,C22H30N6OS,426.59,1.57,1,6,56.64,4,30,True,True,True,9.43,Analysis Set (Screening Candidates),-8.697,Success,3G0B
+CHEMBL1230763,CHEMBL1230763,COC(=O)c1ccc(NC(=O)NC[C@H]2CC[C@@H](C(=O)N3CCC[C@H]3CN)N2)cc1,C20H29N5O4,403.48,0.67,4,6,125.79,6,29,True,True,True,8.17,Analysis Set (Screening Candidates),-8.316,Success,3G0B
+CHEMBL1230044,CHEMBL1230044,N[C@H]1CN(C(=O)c2cnc3ccccc3n2)C[C@H]1C(=O)N1CCCC1,C18H21N5O2,339.4,0.65,1,5,92.42,2,25,True,True,True,7.19,Analysis Set (Screening Candidates),-9.078,Success,3G0B
+CHEMBL2298396,CHEMBL2298396,N#C[C@@H]1C[C@@H]2C[C@@H]2N1C(=O)[C@@H](N)C12C[C@H]3C[C@@H](C1)C[C@](O)(C3)C2,C18H25N3O2,315.42,1.16,2,4,90.35,2,23,True,True,True,7.64,Analysis Set (Screening Candidates),-8.288,Success,3G0B
+CHEMBL3114069,CHEMBL3114069,N#C[C@@H]1C[C@H]2C[C@H]2N1C(=O)[C@@H](N)C12CC3CC(CC(O)(C3)C1)C2,C18H25N3O2,315.42,1.16,2,4,90.35,2,23,True,True,True,5.36,Analysis Set (Screening Candidates),-7.923,Success,3G0B
+CHEMBL3121246,CHEMBL3121246,CCOC(=O)c1c(O)cc(O)c2c1OC(c1ccc(O)cc1)CC2,C18H18O6,330.34,3.05,3,6,96.22,3,24,True,True,True,3.94,Analysis Set (Screening Candidates),-7.869,Success,3G0B
+CHEMBL251958,FLAVOKAWAIN C,COc1cc(O)c(C(=O)/C=C/c2ccc(O)cc2)c(OC)c1,C17H16O5,300.31,3.01,2,5,75.99,5,22,True,True,True,4.48,Analysis Set (Screening Candidates),-7.98,Success,3G0B
+CHEMBL599763,ISOLIQUIRITIN,O=C(/C=C/c1ccc(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)cc1)c1ccc(O)cc1O,C21H22O9,418.4,0.17,6,9,156.91,6,30,True,False,True,4.57,Analysis Set (Screening Candidates),-8.358,Success,3G0B
+CHEMBL75589,OMBUINE,COc1cc(O)c2c(=O)c(O)c(-c3ccc(OC)c(O)c3)oc2c1,C17H14O7,330.29,2.59,3,7,109.36,3,24,True,True,True,4.38,Analysis Set (Screening Candidates),-8.194,Success,3G0B
+CHEMBL164,MYRICETIN,O=c1c(O)c(-c2cc(O)c(O)c(O)c2)oc2cc(O)cc(O)c12,C15H10O8,318.24,1.69,6,8,151.59,1,23,True,False,True,4.43,Analysis Set (Screening Candidates),-8.116,Success,3G0B
+CHEMBL1724888,CHEMBL1724888,O=C(CC(O)CCc1ccccc1)c1ccc(O)cc1,C17H18O3,270.33,2.96,2,3,57.53,6,20,True,True,True,4.42,Analysis Set (Screening Candidates),-8.062,Success,3G0B
+CHEMBL2048503,CHEMBL2048503,COC(=O)C1(O)CC(O)C(O)C(OC(=O)/C=C/c2ccc(O)c(O)c2)C1,C17H20O9,368.34,-0.56,5,9,153.75,4,26,True,False,True,4.38,Analysis Set (Screening Candidates),-8.225,Success,3G0B
+CHEMBL3220151,CHEMBL3220151,O=C(CCCCc1ccccc1)c1ccc(O)cc1,C17H18O2,254.33,3.99,1,2,37.3,6,19,True,True,True,4.65,Analysis Set (Screening Candidates),-7.503,Success,3G0B
+CHEMBL17347,ETHYL CAFFEATE,CCOC(=O)/C=C/c1ccc(O)c(O)c1,C11H12O4,208.21,1.67,2,4,66.76,3,15,True,True,True,4.06,Analysis Set (Screening Candidates),-6.559,Success,3G0B
+CHEMBL66879,COUMARIC ACID,O=C(O)/C=C/c1ccc(O)cc1,C9H8O3,164.16,1.49,2,2,57.53,2,12,True,True,True,4.08,Analysis Set (Screening Candidates),-5.66,Success,3G0B
+CHEMBL508494,DAPHNORETIN,COc1cc2cc(Oc3ccc4ccc(=O)oc4c3)c(=O)oc2cc1O,C19H12O7,352.3,3.41,1,7,99.11,3,26,True,True,True,4.06,Analysis Set (Screening Candidates),-8.906,Success,3G0B
+CHEMBL269277,BETULINIC ACID,C=C(C)[C@@H]1CC[C@]2(C(=O)O)CC[C@]3(C)[C@H](CC[C@@H]4[C@@]5(C)CC[C@H](O)C(C)(C)[C@@H]5CC[C@]43C)[C@@H]12,C30H48O3,456.71,7.09,2,2,57.53,2,33,True,True,True,4.25,Analysis Set (Screening Candidates),-8.194,Success,3G0B
+CHEMBL400359,DIHYDROCHELERYTHRINE,COc1ccc2c(c1OC)CN(C)c1c-2ccc2cc3c(cc12)OCO3,C21H19NO4,349.39,4.2,0,5,40.16,2,26,True,True,True,4.25,Analysis Set (Screening Candidates),-8.227,Success,3G0B
+CHEMBL3220152,CHEMBL3220152,COc1ccc2c(c1OC)C(O)N(C)c1c-2ccc2cc3c(cc12)OCO3,C21H19NO5,365.39,3.69,1,6,60.39,2,27,True,True,True,4.49,Analysis Set (Screening Candidates),-8.099,Success,3G0B
+CHEMBL221542,BETA-SITOSTEROL,CC[C@H](CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C)C(C)C,C29H50O,414.72,8.02,1,1,20.23,6,30,True,True,True,4.54,Analysis Set (Screening Candidates),-8.233,Success,3G0B
+CHEMBL574038,ISODAPHNETICIN,COc1cc([C@@H]2Oc3ccc4ccc(=O)oc4c3O[C@H]2CO)ccc1O,C19H16O7,356.33,2.38,2,7,98.36,3,26,True,True,True,4.85,Analysis Set (Screening Candidates),-7.6,Success,3G0B
+CHEMBL3343905,CHEMBL3343905,C=CC(O)C(/C=C/C#CC#CC#CC)O[C@@H]1O[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O,C19H22O7,362.38,-1.7,5,7,119.61,6,26,True,True,True,4.0,Analysis Set (Screening Candidates),-6.542,Success,3G0B
+CHEMBL3343904,CHEMBL3343904,CC#CC#CC#C/C=C/C=C/C(CCO)O[C@@H]1O[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O,C20H24O7,376.41,-1.3,5,7,119.61,7,27,True,True,True,4.0,Analysis Set (Screening Candidates),-6.692,Success,3G0B
+CHEMBL91933,CHEMBL91933,O=Cc1ccc(-c2ccc(-c3cccs3)s2)s1,C13H8OS3,276.41,5.02,0,4,17.07,3,17,True,True,True,6.05,Analysis Set (Screening Candidates),-6.757,Success,3G0B
+CHEMBL3343903,CHEMBL3343903,CCOCc1ccc(-c2ccc(-c3cccs3)s2)s1,C15H14OS3,306.48,5.74,0,4,9.23,5,19,True,True,True,6.29,Analysis Set (Screening Candidates),-6.938,Success,3G0B
+CHEMBL3343902,CHEMBL3343902,COCc1ccc(-c2ccc(-c3cccs3)s2)s1,C14H12OS3,292.45,5.35,0,4,9.23,4,18,True,True,True,5.62,Analysis Set (Screening Candidates),-6.594,Success,3G0B
+CHEMBL90170,CHEMBL90170,OCc1ccc(-c2ccc(-c3cccs3)s2)s1,C13H10OS3,278.42,4.7,1,4,20.23,3,17,True,True,True,5.47,Analysis Set (Screening Candidates),-6.775,Success,3G0B
+CHEMBL3343901,CHEMBL3343901,CC(C)CC(=O)OCCC#Cc1ccc(-c2ccc(COC(=O)CC(C)C)s2)s1,C23H28O4S2,432.61,5.9,0,6,52.6,9,29,True,True,True,6.12,Analysis Set (Screening Candidates),-6.498,Success,3G0B
+CHEMBL3343900,CHEMBL3343900,OCc1ccc(-c2ccc(C#CC(O)CO)s2)s1,C13H12O3S2,280.37,1.67,3,5,60.69,3,18,True,True,True,5.55,Analysis Set (Screening Candidates),-6.693,Success,3G0B
+CHEMBL3343899,CHEMBL3343899,CC#CC#Cc1ccc(C#CC(O)CO)s1,C13H10O2S,230.29,0.83,2,3,40.46,1,16,True,True,True,5.56,Analysis Set (Screening Candidates),-6.439,Success,3G0B
+CHEMBL4296719,DUTOGLIPTIN,O=C(CN[C@@H]1CCNC1)N1CCC[C@H]1B(O)O,C10H20BN3O3,241.1,-2.06,4,5,84.83,4,17,True,True,False,7.64,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL584162,DAPHNETICIN,COc1cc([C@H]2Oc3ccc4ccc(=O)oc4c3O[C@@H]2CO)cc(OC)c1O,C20H18O8,386.36,2.39,2,8,107.59,4,28,True,True,True,4.85,Analysis Set (Screening Candidates),-8.114,Success,3G0B
+CHEMBL16709,CHEMBL16709,CC(C)C(N)C(=O)N1CCCC1,C9H18N2O,170.26,0.59,1,2,46.33,2,12,True,True,True,6.26,Analysis Set (Screening Candidates),-5.973,Success,3G0B
+CHEMBL577,ENALAPRILAT ANHYDROUS,C[C@H](N[C@@H](CCc1ccccc1)C(=O)O)C(=O)N1CCC[C@H]1C(=O)O,C18H24N2O5,348.4,1.13,3,4,106.94,8,25,True,True,True,4.0,Analysis Set (Screening Candidates),-7.866,Success,3G0B
+CHEMBL4176189,CHEMBL4176189,CC(C)[C@H](N)C(=O)N1CCCC1B(O)O,C9H19BN2O3,214.07,-1.03,3,4,86.79,3,15,True,True,False,7.66,Analysis Set (Screening Candidates),,Skipped (Unsupported Atom Type),3G0B
+CHEMBL91777,VALYLTRYPTOPHAN,CC(C)[C@H](N)C(=O)N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O,C16H21N3O3,303.36,1.26,4,3,108.21,6,22,True,True,True,4.18,Analysis Set (Screening Candidates),-7.79,Success,3G0B
+CHEMBL288114,GALLIC ACID,O=C(O)c1cc(O)c(O)c(O)c1,C7H6O5,170.12,0.5,4,4,97.99,1,12,True,True,True,5.33,Analysis Set (Screening Candidates),-5.77,Success,3G0B
+CHEMBL297453,EPIGALOCATECHIN GALLATE,O=C(O[C@@H]1Cc2c(O)cc(O)cc2O[C@@H]1c1cc(O)c(O)c(O)c1)c1cc(O)c(O)c(O)c1,C22H18O11,458.38,2.23,8,11,197.37,3,33,False,False,True,4.99,Analysis Set (Screening Candidates),-8.561,Success,3G0B
+CHEMBL257839,KUROMANIN,OC[C@H]1O[C@@H](Oc2cc3c(O)cc(O)cc3[o+]c2-c2ccc(O)c(O)c2)[C@H](O)[C@@H](O)[C@@H]1O,C21H21O11+,449.39,0.38,8,10,191.6,4,32,True,False,True,6.38,Analysis Set (Screening Candidates),-8.206,Success,3G0B
+CHEMBL2165586,ERIOCITRIN,C[C@@H]1O[C@@H](OC[C@H]2O[C@@H](Oc3cc(O)c4c(c3)O[C@H](c3ccc(O)c(O)c3)CC4=O)[C@H](O)[C@@H](O)[C@@H]2O)[C@H](O)[C@H](O)[C@H]1O,C27H32O15,596.54,-1.46,9,15,245.29,6,42,False,False,True,4.98,Analysis Set (Screening Candidates),,Docking Failed,3G0B
+CHEMBL592005,MALVIDIN CHLORIDE,COc1cc(-c2[o+]c3cc(O)cc(O)c3cc2O)cc(OC)c1O,C17H15O7+,331.3,3.22,4,6,110.68,3,24,True,True,True,5.85,Analysis Set (Screening Candidates),-7.715,Success,3G0B
+CHEMBL145,CAFFEIC ACID,O=C(O)/C=C/c1ccc(O)c(O)c1,C9H8O4,180.16,1.2,3,3,77.76,2,13,True,True,True,5.47,Analysis Set (Screening Candidates),-6.038,Success,3G0B
+CHEMBL511367,CYANIDIN CHLORIDE,Oc1cc(O)c2cc(O)c(-c3ccc(O)c(O)c3)[o+]c2c1,C15H11O6+,287.25,2.91,5,5,112.45,1,21,True,True,True,5.85,Analysis Set (Screening Candidates),-7.9,Success,3G0B
+CHEMBL165,RESVERATROL,Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1,C14H12O3,228.25,2.97,3,3,60.69,2,17,True,True,True,9.22,Analysis Set (Screening Candidates),-7.282,Success,3G0B
+CHEMBL44,GENISTEIN,O=c1c(-c2ccc(O)cc2)coc2cc(O)cc(O)c12,C15H10O5,270.24,2.58,3,5,90.9,1,20,True,True,True,6.32,Analysis Set (Screening Candidates),-7.884,Success,3G0B
+CHEMBL9352,NARINGENIN,O=C1C[C@@H](c2ccc(O)cc2)Oc2cc(O)cc(O)c21,C15H12O5,272.26,2.51,3,5,86.99,1,20,True,True,True,6.62,Analysis Set (Screening Candidates),-7.894,Success,3G0B
+CHEMBL399121,HESPERETIN,COc1ccc([C@@H]2CC(=O)c3c(O)cc(O)cc3O2)cc1O,C16H14O6,302.28,2.52,3,6,96.22,2,22,True,True,True,6.55,Analysis Set (Screening Candidates),-8.253,Success,3G0B
+CHEMBL275638,FLAVONE,O=c1cc(-c2ccccc2)oc2ccccc12,C15H10O2,222.24,3.46,0,2,30.21,1,17,True,True,True,6.77,Analysis Set (Screening Candidates),-8.169,Success,3G0B
+CHEMBL28,APIGENIN,O=c1cc(-c2ccc(O)cc2)oc2cc(O)cc(O)c12,C15H10O5,270.24,2.58,3,5,90.9,1,20,True,True,True,6.85,Analysis Set (Screening Candidates),-7.844,Success,3G0B
+CHEMBL151,LUTEOLIN,O=c1cc(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12,C15H10O6,286.24,2.28,4,6,111.13,1,21,True,True,True,6.92,Analysis Set (Screening Candidates),-8.061,Success,3G0B
+CHEMBL225304,PIMAGEDINE,N=C(N)NN,CH6N4,74.09,-1.66,4,2,87.92,0,5,True,True,True,,Analysis Set (Screening Candidates),-4.421,Success,3G0B
+CHEMBL595,PIOGLITAZONE,CCc1ccc(CCOc2ccc(CC3SC(=O)NC3=O)cc2)nc1,C19H20N2O3S,356.45,3.16,1,5,68.29,7,25,True,True,True,,Analysis Set (Screening Candidates),-8.242,Success,3G0B
+CHEMBL33864,"LIPOIC ACID, ALPHA",O=C(O)CCCCC1CCSS1,C8H14O2S2,206.33,2.79,1,3,37.3,5,12,True,True,True,,Analysis Set (Screening Candidates),-5.14,Success,3G0B
+CHEMBL25554,CHEMBL25554,COc1cccc(OC)c1OCCNCC1COc2ccccc2O1,C19H23NO5,345.4,2.51,1,6,58.18,8,25,True,True,True,3.15,Analysis Set (Screening Candidates),-7.956,Success,3G0B
+CHEMBL20,ACETAZOLAMIDE,CC(=O)Nc1nnc(S(N)(=O)=O)s1,C4H6N4O3S2,222.25,-0.86,2,6,115.04,2,13,True,True,True,,Analysis Set (Screening Candidates),-6.237,Success,3G0B
+CHEMBL1929396,ANAGLIPTIN,Cc1cc2ncc(C(=O)NCC(C)(C)NCC(=O)N3CCC[C@H]3C#N)cn2n1,C19H25N7O2,383.46,0.65,2,6,115.42,6,28,True,True,True,8.48,Analysis Set (Screening Candidates),-8.142,Success,3G0B
+CHEMBL139702,LICOAGROCHACONE A,C=CC(C)(C)c1cc(/C=C/C(=O)c2ccc(O)cc2)c(OC)cc1O,C21H22O4,338.4,4.47,2,4,66.76,6,25,True,True,True,4.52,Analysis Set (Screening Candidates),-7.674,Success,3G0B
+CHEMBL1894963,CHEMBL1894963,Cn1c(=O)c2c(nc(N3CCOCC3)n2Cc2ccccc2)n(C)c1=O,C18H21N5O3,355.4,0.32,0,5,74.29,3,26,True,True,True,7.81,Analysis Set (Screening Candidates),-8.479,Success,3G0B
