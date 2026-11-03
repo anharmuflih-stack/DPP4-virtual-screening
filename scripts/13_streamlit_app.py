@@ -43,6 +43,7 @@ st.markdown("""
         header {visibility: hidden !important;}
         #MainMenu {visibility: hidden !important;}
         footer {visibility: hidden !important;}
+        [data-testid="stElementToolbar"] {display: none !important;}
         
         /* Gaya Kartu Sains (Science Card) */
         .science-card {
@@ -360,10 +361,10 @@ st.markdown("""
 # ==========================================
 # 5. TABS STRUKTURAL
 # ==========================================
-tab_screen, tab_curation, tab_explorer = st.tabs([
+tab_screen, tab_explorer, tab_curation = st.tabs([
     "🔬 Single Screener & 3D Interaction", 
-    "🧪 Data Curation & Validation Hub", 
-    "🌿 Screened Natural Products Library"
+    "🌿 Screened Natural Products Library",
+    "🧪 Data Curation & Validation Hub"
 ])
 
 # -------------------------------------------------------------
@@ -521,109 +522,7 @@ with tab_screen:
             st.info("👈 Masukkan struktur SMILES atau pilih preset bahan alam di panel sebelah kiri untuk memulai penapisan (*screening*).")
 
 # -------------------------------------------------------------
-# TAB 2: DATA CURATION & VALIDATION HUB
-# -------------------------------------------------------------
-with tab_curation:
-    st.markdown('<h3 style="color: #0f172a; margin-bottom: 0.5rem;">🧪 Data Curation & Validation Hub</h3>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">Audit kualitas data molekuler, pembagian Test vs Analysis Set, serta validasi korelasi eksperimental penapisan obat DPP-4.</p>', unsafe_allow_html=True)
-    
-    if df_master is not None:
-        c1, c2, c3, c4, c5, c6 = st.columns(6)
-        with c1:
-            st.metric("Total Natural Products", len(df_master))
-        with c2:
-            test_cnt = len(df_test) if df_test is not None else 0
-            st.metric("Test Set (Control)", test_cnt)
-        with c3:
-            an_cnt = len(df_analysis) if df_analysis is not None else 0
-            st.metric("Analysis Set (Hits)", an_cnt)
-        with c4:
-            st.metric("Valid RDKit SMILES", "100%")
-        with c5:
-            lip_rate = f"{df_master['Lipinski_Pass'].mean()*100:.1f}%"
-            st.metric("Lipinski Ro5 Pass", lip_rate)
-        with c6:
-            veber_rate = f"{df_master['Veber_Pass'].mean()*100:.1f}%"
-            st.metric("Veber Pass", veber_rate)
-            
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # Section 1: Quality Validation Audit Table
-        st.markdown("""
-<div class="science-card">
-<h4 style="color: #0f172a; margin-bottom: 1rem;">1. Audit Integritas & Kualitas Data Molekuler</h4>
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-    <div class="metric-box">
-        <div class="data-label">Validitas Struktur & Conformer 3D</div>
-        <div style="font-size: 0.9rem; color: #1e293b; margin-top: 0.25rem;">
-            <b>114/114 (100%)</b> SMILES valid RDKit<br>
-            <b>113/114 (99.1%)</b> Berhasil konformasi 3D MMFF94
-        </div>
-    </div>
-    <div class="metric-box">
-        <div class="data-label">Nilai Hilang (Missing Values)</div>
-        <div style="font-size: 0.9rem; color: #10b981; font-weight: 600; margin-top: 0.25rem;">
-            Nol Missing Values (0)<br>
-            <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">Lengkap pada MW, LogP, HBD, HBA, TPSA</span>
-        </div>
-    </div>
-    <div class="metric-box">
-        <div class="data-label">Kompatibilitas Gaya Atom Vina</div>
-        <div style="font-size: 0.9rem; color: #0284c7; font-weight: 600; margin-top: 0.25rem;">
-            107 Senyawa Kompatibel Penuh<br>
-            <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">7 Anolog boron dipeptida ditandai covalent/transition</span>
-        </div>
-    </div>
-</div>
-</div>
-""", unsafe_allow_html=True)
-
-        # Section 2: Dataset Partitioning
-        st.markdown("""
-<div class="science-card">
-<h4 style="color: #0f172a; margin-bottom: 0.5rem;">2. Pemisahan Dataset (Test Set vs Analysis Set)</h4>
-<p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">
-<b>Test Set</b> dirancang untuk menguji presisi docking, akurasi pose, dan konsistensi skor vs bioaktivitas eksperimental (memuat Fitokimia Acuan & Kontrol Inhibitor). 
-<b>Analysis Set</b> digunakan untuk penapisan forward menemukan kandidat inhibitor bahan alam terbaik.
-</p>
-</div>
-""", unsafe_allow_html=True)
-        
-        split_view = st.radio("Pilih Dataset yang Ditampilkan:", ["Test Set (Validation & Benchmark)", "Analysis Set (Screening Candidates)", "Master Dataset (Semua)"], horizontal=True)
-        
-        if split_view == "Test Set (Validation & Benchmark)" and df_test is not None:
-            st.dataframe(df_test[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'pIC50', 'compound_source']], use_container_width=True)
-            st.download_button("📥 Unduh Test Set (CSV)", df_test.to_csv(index=False), "dpp4_natural_products_test_set.csv", "text/csv")
-        elif split_view == "Analysis Set (Screening Candidates)" and df_analysis is not None:
-            st.dataframe(df_analysis[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'Lipinski_Pass', 'compound_source']], use_container_width=True)
-            st.download_button("📥 Unduh Analysis Set (CSV)", df_analysis.to_csv(index=False), "dpp4_natural_products_analysis_set.csv", "text/csv")
-        else:
-            st.dataframe(df_master[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'dataset_split']], use_container_width=True)
-            st.download_button("📥 Unduh Master Dataset (CSV)", df_master.to_csv(index=False), "curated_natural_products_master.csv", "text/csv")
-            
-        # Section 3: Predictive Validity Correlation
-        if summary_metrics and 'correlation_metrics' in summary_metrics:
-            corr_val = summary_metrics['correlation_metrics'].get('pearson_r', -0.58)
-            st.markdown(f"""
-<div class="science-card" style="margin-top: 1.5rem;">
-<h4 style="color: #0f172a; margin-bottom: 0.5rem;">3. Validasi Korelasi Eksperimental (pIC50 vs AutoDock Vina Energy)</h4>
-<div style="display: flex; align-items: center; gap: 2rem;">
-    <div style="background: #e0f2fe; padding: 1rem 1.5rem; border-radius: 8px; border: 1px solid #bae6fd;">
-        <div style="font-size: 0.8rem; font-weight: 600; color: #0369a1; text-transform: uppercase;">Pearson Correlation (r)</div>
-        <div style="font-size: 1.8rem; font-weight: 800; color: #0284c7; font-family: 'Fira Code', monospace;">{corr_val}</div>
-    </div>
-    <div style="color: #475569; font-size: 0.9rem; line-height: 1.5;">
-        Korelasi negatif yang signifikan membuktikan bahwa senyawa dengan afinitas biologis laboratorium lebih tinggi (pIC50 besar) 
-        secara konsisten menghasilkan energi bebas ikatan (*binding affinity*) yang lebih kuat / negatif pada simulasi AutoDock Vina reseptor DPP-4.
-    </div>
-</div>
-</div>
-""", unsafe_allow_html=True)
-    else:
-        st.warning("Dataset terkurasi belum dimuat. Jalankan script `14_curation_validation_test.py` terlebih dahulu.")
-
-# -------------------------------------------------------------
-# TAB 3: NATURAL PRODUCTS SCREENING & TOP HITS LIBRARY
+# TAB 2: NATURAL PRODUCTS SCREENING & TOP HITS LIBRARY
 # -------------------------------------------------------------
 with tab_explorer:
     st.markdown('<h3 style="color: #0f172a; margin-bottom: 0.5rem;">🌿 Screened Natural Products Library & Top Hits</h3>', unsafe_allow_html=True)
@@ -691,3 +590,105 @@ with tab_explorer:
         st.download_button("📥 Unduh Seluruh Hasil Skrining (CSV)", filtered_df.to_csv(index=False), "dpp4_natural_products_docking_results.csv", "text/csv")
     else:
         st.info("Pangkalan data hasil skrining sedang diproses atau belum tersedia.")
+
+# -------------------------------------------------------------
+# TAB 3: DATA CURATION & VALIDATION HUB (INFORMASI SAJA)
+# -------------------------------------------------------------
+with tab_curation:
+    st.markdown('<h3 style="color: #0f172a; margin-bottom: 0.5rem;">🧪 Data Curation & Validation Hub</h3>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">Audit kualitas data molekuler, pembagian Test vs Analysis Set, serta validasi korelasi eksperimental penapisan obat DPP-4 (Ditampilkan sebagai informasi referensi).</p>', unsafe_allow_html=True)
+    
+    if df_master is not None:
+        c1, c2, c3, c4, c5, c6 = st.columns(6)
+        with c1:
+            st.metric("Total Natural Products", len(df_master))
+        with c2:
+            test_cnt = len(df_test) if df_test is not None else 0
+            st.metric("Test Set (Control)", test_cnt)
+        with c3:
+            an_cnt = len(df_analysis) if df_analysis is not None else 0
+            st.metric("Analysis Set (Hits)", an_cnt)
+        with c4:
+            st.metric("Valid RDKit SMILES", "100%")
+        with c5:
+            lip_rate = f"{df_master['Lipinski_Pass'].mean()*100:.1f}%"
+            st.metric("Lipinski Ro5 Pass", lip_rate)
+        with c6:
+            veber_rate = f"{df_master['Veber_Pass'].mean()*100:.1f}%"
+            st.metric("Veber Pass", veber_rate)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Section 1: Quality Validation Audit Table
+        st.markdown("""
+<div class="science-card">
+<h4 style="color: #0f172a; margin-bottom: 1rem;">1. Audit Integritas & Kualitas Data Molekuler</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+    <div class="metric-box">
+        <div class="data-label">Validitas Struktur & Conformer 3D</div>
+        <div style="font-size: 0.9rem; color: #1e293b; margin-top: 0.25rem;">
+            <b>114/114 (100%)</b> SMILES valid RDKit<br>
+            <b>113/114 (99.1%)</b> Berhasil konformasi 3D MMFF94
+        </div>
+    </div>
+    <div class="metric-box">
+        <div class="data-label">Nilai Hilang (Missing Values)</div>
+        <div style="font-size: 0.9rem; color: #10b981; font-weight: 600; margin-top: 0.25rem;">
+            Nol Missing Values (0)<br>
+            <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">Lengkap pada MW, LogP, HBD, HBA, TPSA</span>
+        </div>
+    </div>
+    <div class="metric-box">
+        <div class="data-label">Kompatibilitas Gaya Atom Vina</div>
+        <div style="font-size: 0.9rem; color: #0284c7; font-weight: 600; margin-top: 0.25rem;">
+            107 Senyawa Kompatibel Penuh<br>
+            <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">7 Anolog boron dipeptida ditandai covalent/transition</span>
+        </div>
+    </div>
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+        # Section 2: Dataset Partitioning (Read-Only Information)
+        st.markdown("""
+<div class="science-card">
+<h4 style="color: #0f172a; margin-bottom: 0.5rem;">2. Informasi Pemisahan Dataset (Test Set vs Analysis Set)</h4>
+<p style="color: #64748b; font-size: 0.85rem; margin-bottom: 0.75rem;">
+<b>Test Set</b> dirancang untuk menguji presisi docking, akurasi pose, dan konsistensi skor vs bioaktivitas eksperimental (memuat Fitokimia Acuan & Kontrol Inhibitor). 
+<b>Analysis Set</b> digunakan untuk penapisan forward menemukan kandidat inhibitor bahan alam terbaik.
+</p>
+<div style="background-color: #f1f5f9; border-left: 4px solid #64748b; padding: 0.6rem 1rem; border-radius: 0.375rem; font-size: 0.8rem; color: #475569;">
+🔒 <b>Mode Informasi (Read-Only):</b> Tampilan dataset di bawah ini disajikan khusus sebagai informasi kurasi dan validasi. Unduhan berkas mentah/terkurasi tidak tersedia di antarmuka publik dan hanya dapat diakses oleh pengembang melalui direktori lokal (<code>data/02_processed/</code>) atau repositori GitHub proyek.
+</div>
+</div>
+""", unsafe_allow_html=True)
+        
+        split_view = st.radio("Pilih Informasi Dataset yang Ditampilkan:", ["Test Set (Validation & Benchmark)", "Analysis Set (Screening Candidates)", "Master Dataset (Semua)"], horizontal=True)
+        
+        if split_view == "Test Set (Validation & Benchmark)" and df_test is not None:
+            st.dataframe(df_test[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'pIC50', 'compound_source']], use_container_width=True, hide_index=True)
+        elif split_view == "Analysis Set (Screening Candidates)" and df_analysis is not None:
+            st.dataframe(df_analysis[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'Lipinski_Pass', 'compound_source']], use_container_width=True, hide_index=True)
+        else:
+            st.dataframe(df_master[['compound_name', 'molecule_chembl_id', 'MW', 'LogP', 'HBD', 'HBA', 'dataset_split']], use_container_width=True, hide_index=True)
+            
+        # Section 3: Predictive Validity Correlation
+        if summary_metrics and 'correlation_metrics' in summary_metrics:
+            corr_val = summary_metrics['correlation_metrics'].get('pearson_r', -0.58)
+            st.markdown(f"""
+<div class="science-card" style="margin-top: 1.5rem;">
+<h4 style="color: #0f172a; margin-bottom: 0.5rem;">3. Validasi Korelasi Eksperimental (pIC50 vs AutoDock Vina Energy)</h4>
+<div style="display: flex; align-items: center; gap: 2rem;">
+    <div style="background: #e0f2fe; padding: 1rem 1.5rem; border-radius: 8px; border: 1px solid #bae6fd;">
+        <div style="font-size: 0.8rem; font-weight: 600; color: #0369a1; text-transform: uppercase;">Pearson Correlation (r)</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #0284c7; font-family: 'Fira Code', monospace;">{corr_val}</div>
+    </div>
+    <div style="color: #475569; font-size: 0.9rem; line-height: 1.5;">
+        Korelasi negatif yang signifikan membuktikan bahwa senyawa dengan afinitas biologis laboratorium lebih tinggi (pIC50 besar) 
+        secara konsisten menghasilkan energi bebas ikatan (*binding affinity*) yang lebih kuat / negatif pada simulasi AutoDock Vina reseptor DPP-4.
+    </div>
+</div>
+</div>
+""", unsafe_allow_html=True)
+    else:
+        st.warning("Dataset terkurasi belum dimuat. Jalankan script `14_curation_validation_test.py` terlebih dahulu.")

@@ -73,7 +73,7 @@ Server Streamlit Cloud (berbasis Linux) secara otomatis akan mengunduh aplikasi 
   * `curated_np_all_docking_results.csv`: Hasil gabungan seluruh senyawa terkurasi.
   * `validation_metrics_summary.json`: Metrik korelasi ($r$ Pearson) dan ringkasan validasi.
 - `scripts/`:
-  * `13_streamlit_app.py`: Aplikasi Web Streamlit modern dengan 3 Tab (Penapisan 3D, Hub Validasi Data, dan Pustaka Hasil Skrining Bahan Alam).
+  * `13_streamlit_app.py`: Aplikasi Web Streamlit modern dengan 3 Tab (Penapisan 3D, Pustaka Hasil Skrining Bahan Alam, dan Hub Informasi Kurasi & Validasi Data).
   * `14_curation_validation_test.py`: Script otomatisasi kurasi data ChEMBL, validasi integritas, pemisahan dataset, dan eksekusi penapisan virtual paralel multi-core.
 
 ---
