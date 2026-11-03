@@ -8,6 +8,9 @@ Selamat datang di platform *Computational Drug Discovery* untuk penemuan inhibit
 💻 **Kode Sumber / Repositori GitHub:** 
 [**https://github.com/anharmuflih-stack/DPP4-virtual-screening**](https://github.com/anharmuflih-stack/DPP4-virtual-screening)
 
+📑 **Laporan Resmi Kurasi, Validasi & Kelayakan Agent:**
+[**docs/LAPORAN_KURASI_DAN_VALIDASI.md**](file:///Users/aanmuf/drug_discovery/dpp4_project/docs/LAPORAN_KURASI_DAN_VALIDASI.md)
+
 ---
 
 ## 1. Menjalankan Aplikasi Secara Lokal (Offline)
@@ -54,12 +57,32 @@ Server Streamlit Cloud (berbasis Linux) secara otomatis akan mengunduh aplikasi 
 
 ---
 
-## 3. Struktur Direktori Data
+## 3. Struktur Direktori Data & Hasil Analisis
 
-- `data/01_raw/`: Berisi pangkalan data *raw* bioaktivitas dari ChEMBL.
+- `data/01_raw/`: Berisi pangkalan data *raw* bioaktivitas dari ChEMBL (`dpp4_activities_raw.csv`).
+- `data/02_processed/`: Himpunan data terkurasi hasil standardisasi:
+  * `curated_natural_products_master.csv`: Pustaka 114 senyawa bahan alam terkurasi lengkap.
+  * `dpp4_natural_products_test_set.csv`: Data Uji / Validasi (20 senyawa benchmark & kontrol).
+  * `dpp4_natural_products_analysis_set.csv`: Data Analisis / Screening (94 kandidat bahan alam).
 - `data/03_pdb/`: Struktur protein DPP-4 (3G0B & 5T4B) bersih yang telah disiapkan.
-- `data/04_ligands_pdbqt/`: Himpunan molekul siap tambat dalam format PDBQT.
-- `results/`: Seluruh catatan Log *docking* dan luaran konformasi molekul (jika dijalankan dengan metode *batch*).
-- `scripts/`: Berisi seluruh mesin aplikasi web (`13_streamlit_app.py`) dan alat-alat otomatisasi lainnya.
+- `data/04_ligands_pdbqt/`: Himpunan molekul ligan bahan alam siap tambat dalam format PDBQT.
+- `data/05_receptors_pdbqt/`: Model reseptor DPP-4 (3G0B & 5T4B) teroptimasi format PDBQT.
+- `results/02_docking/`: Hasil penapisan virtual lengkap:
+  * `test_set_docking_results.csv`: Luaran penapisan Data Test pada 3G0B & 5T4B.
+  * `analysis_set_docking_results.csv`: Luaran penapisan Data Analisis.
+  * `curated_np_all_docking_results.csv`: Hasil gabungan seluruh senyawa terkurasi.
+  * `validation_metrics_summary.json`: Metrik korelasi ($r$ Pearson) dan ringkasan validasi.
+- `scripts/`:
+  * `13_streamlit_app.py`: Aplikasi Web Streamlit modern dengan 3 Tab (Penapisan 3D, Hub Validasi Data, dan Pustaka Hasil Skrining Bahan Alam).
+  * `14_curation_validation_test.py`: Script otomatisasi kurasi data ChEMBL, validasi integritas, pemisahan dataset, dan eksekusi penapisan virtual paralel multi-core.
+
+---
+
+## 4. Menjalankan Pipeline Kurasi & Validasi Otomatis (Script 14)
+
+Untuk menjalankan kembali proses pengambilan data dari ChEMBL, kurasi struktur kimia, validasi kualitas, pemisahan dataset, dan simulasi docking paralel multi-core:
+```bash
+python3 scripts/14_curation_validation_test.py
+```
 
 *Selamat melakukan eksperimen, semoga penemuan obat Anda berhasil!*

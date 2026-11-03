@@ -1,0 +1,12 @@
+{
+    "total_natural_products_curated": 114,
+    "test_set_size": 20,
+    "analysis_set_size": 94,
+    "mean_affinity_3g0b": -7.61,
+    "best_affinity": -9.67,
+    "top_compound": "CHEMBL227954",
+    "correlation_metrics": {
+        "pearson_r": -0.437,
+        "data_points": 7
+    }
+}
